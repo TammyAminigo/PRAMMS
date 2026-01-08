@@ -120,3 +120,79 @@ def maintenance_update_status(request, pk):
             messages.success(request, 'Status updated successfully!')
     
     return redirect('maintenance_detail', pk=pk)
+
+
+@login_required
+def maintenance_edit(request, pk):
+    """Edit a maintenance request (Tenant only, while status allows)."""
+    maintenance_request = get_object_or_404(MaintenanceRequest, pk=pk)
+    
+    # Only the tenant who created the request can edit
+    if request.user != maintenance_request.tenant:
+        messages.error(request, 'You can only edit your own maintenance requests.')
+        return redirect('maintenance_detail', pk=pk)
+    
+    # Only allow editing if status is pending or in_progress
+    if maintenance_request.status not in ['pending', 'in_progress']:
+        messages.error(request, 'This request can no longer be edited.')
+        return redirect('maintenance_detail', pk=pk)
+    
+    current_images = maintenance_request.images.all()
+    
+    if request.method == 'POST':
+        form = MaintenanceRequestForm(request.POST, instance=maintenance_request)
+        if form.is_valid():
+            form.save()
+            
+            # Handle new image uploads (limit to 3 total)
+            new_images = request.FILES.getlist('images')
+            current_count = current_images.count()
+            available_slots = 3 - current_count
+            
+            if new_images:
+                if len(new_images) > available_slots:
+                    messages.warning(request, f'Maximum 3 images allowed. Only {available_slots} slots available.')
+                    new_images = new_images[:available_slots]
+                
+                for image in new_images:
+                    MaintenanceImage.objects.create(
+                        request=maintenance_request,
+                        image=image
+                    )
+            
+            messages.success(request, 'Maintenance request updated successfully!')
+            return redirect('maintenance_detail', pk=pk)
+    else:
+        form = MaintenanceRequestForm(instance=maintenance_request)
+    
+    return render(request, 'maintenance/maintenance_edit.html', {
+        'form': form,
+        'maintenance_request': maintenance_request,
+        'current_images': current_images,
+        'available_slots': 3 - current_images.count()
+    })
+
+
+@login_required
+def maintenance_delete_image(request, pk):
+    """Delete an image from a maintenance request (Tenant only)."""
+    image = get_object_or_404(MaintenanceImage, pk=pk)
+    maintenance_request = image.request
+    
+    # Only the tenant who created the request can delete images
+    if request.user != maintenance_request.tenant:
+        messages.error(request, 'You can only delete images from your own requests.')
+        return redirect('maintenance_detail', pk=maintenance_request.pk)
+    
+    # Only allow deletion if status is pending or in_progress
+    if maintenance_request.status not in ['pending', 'in_progress']:
+        messages.error(request, 'Images can no longer be deleted from this request.')
+        return redirect('maintenance_detail', pk=maintenance_request.pk)
+    
+    if request.method == 'POST':
+        image.delete()
+        messages.success(request, 'Image deleted successfully!')
+        return redirect('maintenance_edit', pk=maintenance_request.pk)
+    
+    return redirect('maintenance_edit', pk=maintenance_request.pk)
+

@@ -6,12 +6,18 @@
 <div class="dashboard container">
     <div class="dashboard-header">
         <div>
-            <a href="{% url 'maintenance_list' %}" style="color: var(--gray-500); font-size: 0.875rem;">← Back to Requests</a>
+            <a href="{% url 'maintenance_list' %}" style="color: var(--gray-500); font-size: 0.875rem;">← Back to
+                Requests</a>
             <h1 style="margin-top: 0.5rem;">{{ maintenance_request.title }}</h1>
             <p style="color: var(--gray-500);">{{ maintenance_request.property.name }}</p>
         </div>
-        <div>
-            <span class="badge badge-{% if maintenance_request.status == 'pending' %}warning{% elif maintenance_request.status == 'completed' %}success{% elif maintenance_request.status == 'in_progress' %}info{% else %}danger{% endif %}" style="font-size: 1rem; padding: 0.5rem 1rem;">{{ maintenance_request.get_status_display }}</span>
+        <div style="display: flex; gap: 1rem; align-items: center;">
+            {% if not is_landlord and maintenance_request.status in 'pending,in_progress' %}
+            <a href="{% url 'maintenance_edit' maintenance_request.pk %}" class="btn btn-outline">Edit Request</a>
+            {% endif %}
+            <span
+                class="badge badge-{% if maintenance_request.status == 'pending' %}warning{% elif maintenance_request.status == 'completed' %}success{% elif maintenance_request.status == 'in_progress' %}info{% else %}danger{% endif %}"
+                style="font-size: 1rem; padding: 0.5rem 1rem;">{{ maintenance_request.get_status_display }}</span>
         </div>
     </div>
 
@@ -19,10 +25,13 @@
     <div class="card mb-4">
         <div class="card-header">
             <h3 class="card-title">Request Details</h3>
-            <span class="badge badge-{% if maintenance_request.priority == 'low' %}info{% elif maintenance_request.priority == 'medium' %}warning{% elif maintenance_request.priority == 'high' %}danger{% else %}danger{% endif %}">{{ maintenance_request.get_priority_display }} Priority</span>
+            <span
+                class="badge badge-{% if maintenance_request.priority == 'low' %}info{% elif maintenance_request.priority == 'medium' %}warning{% elif maintenance_request.priority == 'high' %}danger{% else %}danger{% endif %}">{{
+                maintenance_request.get_priority_display }} Priority</span>
         </div>
         <div class="card-body">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 1.5rem;">
+            <div
+                style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; margin-bottom: 1.5rem;">
                 <div>
                     <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Submitted By</p>
                     <p style="font-weight: 500;">{{ maintenance_request.tenant.get_full_name }}</p>
@@ -33,12 +42,14 @@
                 </div>
                 <div>
                     <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Submitted On</p>
-                    <p style="font-weight: 500;">{{ maintenance_request.created_at|date:"M d, Y" }} at {{ maintenance_request.created_at|time:"g:i A" }}</p>
+                    <p style="font-weight: 500;">{{ maintenance_request.created_at|date:"M d, Y" }} at {{
+                        maintenance_request.created_at|time:"g:i A" }}</p>
                 </div>
                 {% if maintenance_request.completed_at %}
                 <div>
                     <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Completed On</p>
-                    <p style="font-weight: 500; color: var(--accent);">{{ maintenance_request.completed_at|date:"M d, Y" }}</p>
+                    <p style="font-weight: 500; color: var(--accent);">{{ maintenance_request.completed_at|date:"M d, Y"
+                        }}</p>
                 </div>
                 {% endif %}
             </div>

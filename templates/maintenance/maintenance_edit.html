@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Request - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width: 600px;">
+        <a href="{% url 'maintenance_detail' maintenance_request.pk %}"
+            style="color: var(--gray-500); font-size: 0.875rem;">← Back to Request</a>
+        <h2 style="margin-top: 0.5rem;">Edit Request</h2>
+        <p class="subtitle">Update your maintenance request details</p>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="id_title">Issue Title</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                <p class="form-error">{{ form.title.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_description">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <p class="form-error">{{ form.description.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_priority">Priority Level</label>
+                {{ form.priority }}
+            </div>
+
+            <!-- Current Photos -->
+            {% if current_images %}
+            <div class="form-group">
+                <label class="form-label">Current Photos</label>
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 1rem; margin-top: 0.5rem;">
+                    {% for image in current_images %}
+                    <div style="position: relative; border-radius: 8px; overflow: hidden; background: var(--gray-100);">
+                        <img src="{{ image.image.url }}" alt="Photo {{ forloop.counter }}"
+                            style="width: 100%; height: 100px; object-fit: cover;">
+                        <form method="post" action="{% url 'maintenance_delete_image' image.pk %}"
+                            style="position: absolute; top: 4px; right: 4px;">
+                            {% csrf_token %}
+                            <button type="submit" onclick="return confirm('Delete this photo?')"
+                                style="background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; font-size: 14px; display: flex; align-items: center; justify-content: center;">×</button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Add New Photos -->
+            {% if available_slots > 0 %}
+            <div class="form-group">
+                <label class="form-label" for="images">Add Photos ({{ available_slots }} slot{{
+                    available_slots|pluralize }} available)</label>
+                <input type="file" name="images" id="images" accept="image/*" multiple class="form-input"
+                    style="padding: 0.75rem;">
+                <p class="form-help">You can add up to {{ available_slots }} more photo{{ available_slots|pluralize }}
+                </p>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <p style="color: var(--gray-500); font-size: 0.875rem;">Maximum 3 photos reached. Delete an existing
+                    photo to add a new one.</p>
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Save Changes</button>
+                <a href="{% url 'maintenance_detail' maintenance_request.pk %}" class="btn btn-outline"
+                    style="flex: 1;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
