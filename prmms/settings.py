@@ -159,12 +159,36 @@ WHITENOISE_AUTOREFRESH = True
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Cloudinary configuration for production media storage
+# Cloudinary configuration for production media storage (Django 4.2+ format)
 if os.environ.get('CLOUDINARY_URL'):
-    CLOUDINARY_STORAGE = {
-        'CLOUDINARY_URL': os.environ.get('CLOUDINARY_URL'),
+    import cloudinary
+    import cloudinary.uploader
+    import cloudinary.api
+    
+    # Parse the CLOUDINARY_URL
+    cloudinary.config(
+        cloudinary_url=os.environ.get('CLOUDINARY_URL')
+    )
+    
+    # Use Cloudinary for media files
+    STORAGES = {
+        "default": {
+            "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
     }
-    DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+else:
+    # Local development - use file system storage
+    STORAGES = {
+        "default": {
+            "BACKEND": "django.core.files.storage.FileSystemStorage",
+        },
+        "staticfiles": {
+            "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+        },
+    }
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
