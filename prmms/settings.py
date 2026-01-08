@@ -171,6 +171,9 @@ if not DEBUG:
     SECURE_BROWSER_XSS_FILTER = True
     SECURE_CONTENT_TYPE_NOSNIFF = True
     X_FRAME_OPTIONS = 'DENY'
-    SECURE_SSL_REDIRECT = True
+    # Don't use SECURE_SSL_REDIRECT - Railway handles SSL at proxy level
+    # SECURE_SSL_REDIRECT = True  # This causes redirect loops on Railway!
     SESSION_COOKIE_SECURE = True
     CSRF_COOKIE_SECURE = True
+    # Trust Railway's proxy headers
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
