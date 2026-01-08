@@ -17,3 +17,7 @@ python-dotenv>=1.0.0
 
 # Date utilities
 python-dateutil>=2.8.0
+
+# Cloud storage for media files
+cloudinary>=1.36.0
+django-cloudinary-storage>=0.3.0
