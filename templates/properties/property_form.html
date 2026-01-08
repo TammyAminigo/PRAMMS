@@ -6,8 +6,7 @@
 <div class="auth-container">
     <div class="auth-card" style="max-width: 520px;">
         <h2>{{ title }}</h2>
-        <p class="subtitle">{% if property %}Update property details{% else %}Add a new property to your portfolio{%
-            endif %}</p>
+        <p class="subtitle">{% if property %}Update property details{% else %}Add a new property to your portfolio{% endif %}</p>
 
         <form method="post" novalidate>
             {% csrf_token %}
@@ -52,8 +51,7 @@
             </div>
 
             <div style="display: flex; gap: 1rem;">
-                <button type="submit" class="btn btn-primary" style="flex: 1;">{% if property %}Update Property{% else
-                    %}Add Property{% endif %}</button>
+                <button type="submit" class="btn btn-primary" style="flex: 1;">{% if property %}Update Property{% else %}Add Property{% endif %}</button>
                 <a href="{% url 'property_list' %}" class="btn btn-outline" style="flex: 1;">Cancel</a>
             </div>
         </form>
