@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ title }} - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width: 520px;">
+        <h2>{{ title }}</h2>
+        <p class="subtitle">{% if property %}Update property details{% else %}Add a new property to your portfolio{%
+            endif %}</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="id_name">Property Name</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                <p class="form-error">{{ form.name.errors.0 }}</p>
+                {% endif %}
+                <p class="form-help">A memorable name for this property</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_address">Address</label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                <p class="form-error">{{ form.address.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_unit_number">Unit Number (Optional)</label>
+                {{ form.unit_number }}
+                <p class="form-help">Apartment/unit number if applicable</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_rent_amount">Rent Amount (₦)</label>
+                {{ form.rent_amount }}
+                {% if form.rent_amount.errors %}
+                <p class="form-error">{{ form.rent_amount.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_rent_period">Rent Period</label>
+                {{ form.rent_period }}
+                {% if form.rent_period.errors %}
+                <p class="form-error">{{ form.rent_period.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">{% if property %}Update Property{% else
+                    %}Add Property{% endif %}</button>
+                <a href="{% url 'property_list' %}" class="btn btn-outline" style="flex: 1;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

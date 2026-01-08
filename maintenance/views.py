@@ -1,0 +1,122 @@
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.utils import timezone
+
+from .models import MaintenanceRequest, MaintenanceImage
+from .forms import MaintenanceRequestForm, MaintenanceStatusForm
+
+
+@login_required
+def maintenance_list(request):
+    """List maintenance requests based on user role."""
+    if request.user.is_landlord:
+        # Landlords see requests for all their properties
+        requests = MaintenanceRequest.objects.filter(
+            property__landlord=request.user
+        ).order_by('-created_at')
+    elif request.user.is_tenant:
+        # Tenants see only their own requests
+        requests = MaintenanceRequest.objects.filter(
+            tenant=request.user
+        ).order_by('-created_at')
+    else:
+        requests = MaintenanceRequest.objects.none()
+    
+    return render(request, 'maintenance/maintenance_list.html', {
+        'maintenance_requests': requests
+    })
+
+
+@login_required
+def maintenance_create(request):
+    """Create a new maintenance request (Tenant only)."""
+    if not request.user.is_tenant:
+        messages.error(request, 'Only tenants can create maintenance requests.')
+        return redirect('dashboard')
+    
+    try:
+        tenant_profile = request.user.tenant_profile
+        property_obj = tenant_profile.rental_property
+    except:
+        messages.error(request, 'You must be assigned to a property to create maintenance requests.')
+        return redirect('tenant_dashboard')
+    
+    if request.method == 'POST':
+        form = MaintenanceRequestForm(request.POST)
+        if form.is_valid():
+            maintenance_request = form.save(commit=False)
+            maintenance_request.tenant = request.user
+            maintenance_request.property = property_obj
+            maintenance_request.save()
+            
+            # Handle image uploads (1-3 images)
+            images = request.FILES.getlist('images')
+            if len(images) > 3:
+                messages.warning(request, 'Maximum 3 images allowed. Only first 3 were saved.')
+                images = images[:3]
+            
+            for image in images:
+                MaintenanceImage.objects.create(
+                    request=maintenance_request,
+                    image=image
+                )
+            
+            messages.success(request, 'Maintenance request submitted successfully!')
+            return redirect('maintenance_detail', pk=maintenance_request.pk)
+    else:
+        form = MaintenanceRequestForm()
+    
+    return render(request, 'maintenance/maintenance_form.html', {
+        'form': form,
+        'property': property_obj
+    })
+
+
+@login_required
+def maintenance_detail(request, pk):
+    """View maintenance request details."""
+    maintenance_request = get_object_or_404(MaintenanceRequest, pk=pk)
+    
+    # Check access permission
+    is_landlord = request.user == maintenance_request.property.landlord
+    is_tenant = request.user == maintenance_request.tenant
+    
+    if not (is_landlord or is_tenant):
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+    
+    status_form = None
+    if is_landlord:
+        status_form = MaintenanceStatusForm(instance=maintenance_request)
+        # Mark as viewed by landlord
+        if not maintenance_request.viewed_by_landlord:
+            maintenance_request.viewed_by_landlord = True
+            maintenance_request.save(update_fields=['viewed_by_landlord'])
+    
+    return render(request, 'maintenance/maintenance_detail.html', {
+        'maintenance_request': maintenance_request,
+        'is_landlord': is_landlord,
+        'status_form': status_form
+    })
+
+
+@login_required
+def maintenance_update_status(request, pk):
+    """Update maintenance request status (Landlord only)."""
+    maintenance_request = get_object_or_404(MaintenanceRequest, pk=pk)
+    
+    if request.user != maintenance_request.property.landlord:
+        messages.error(request, 'Only the property landlord can update the status.')
+        return redirect('maintenance_detail', pk=pk)
+    
+    if request.method == 'POST':
+        form = MaintenanceStatusForm(request.POST, instance=maintenance_request)
+        if form.is_valid():
+            updated_request = form.save(commit=False)
+            if updated_request.status == 'completed' and not maintenance_request.completed_at:
+                updated_request.completed_at = timezone.now()
+            updated_request.save()
+            messages.success(request, 'Status updated successfully!')
+    
+    return redirect('maintenance_detail', pk=pk)

@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}PRAMMS - Property Rental and Maintenance Management System{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="container">
+        <p
+            style="font-size: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;">
+            Property Rental and Maintenance Management System</p>
+        <h1>Simplify Your Property Management</h1>
+        <p>The all-in-one platform for landlords and tenants to manage properties, handle maintenance requests, and
+            communicate effortlessly.</p>
+        <div class="hero-actions">
+            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Register as Landlord</a>
+            <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">Login to Your Account</a>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section class="dashboard" style="padding: 4rem 0;">
+    <div class="container">
+        <h2 class="section-title text-center" style="margin-bottom: 3rem;">Why Choose PRAMMS?</h2>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h4>Property Management</h4>
+                    <p>Add and manage multiple properties with detailed information and tenant tracking.</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h4>Secure Invitations</h4>
+                    <p>Invite tenants via unique, single-use links bound to specific properties.</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <path
+                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
+                        </path>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h4>Maintenance Tracking</h4>
+                    <p>Submit, track, and resolve maintenance requests with photo uploads.</p>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon danger">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="1.5">
+                        <line x1="18" y1="20" x2="18" y2="10"></line>
+                        <line x1="12" y1="20" x2="12" y2="4"></line>
+                        <line x1="6" y1="20" x2="6" y2="14"></line>
+                    </svg>
+                </div>
+                <div class="stat-content">
+                    <h4>Dashboard Analytics</h4>
+                    <p>Get insights into your properties, vacancies, and pending requests.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section with integrated footer -->
+<section
+    style="background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 4rem 0 2rem 0; text-align: center; color: white;">
+    <div class="container">
+        <h2 style="color: white; margin-bottom: 1rem;">Ready to Get Started?</h2>
+        <p
+            style="color: var(--gray-300); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+            Join hundreds of landlords who trust PRAMMS to manage their rental properties efficiently.
+        </p>
+        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Create Your Account</a>
+    </div>
+    <!-- Footer content integrated into CTA -->
+    <div class="container" style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);">
+        <p style="color: var(--gray-400); font-size: 0.875rem;">&copy; 2026 PRAMMS - Property Rental and Maintenance
+            Management System</p>
+    </div>
+</section>
+{% endblock %}
+
+{% block footer %}{% endblock %}

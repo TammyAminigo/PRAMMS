@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}My Properties - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="dashboard container">
+    <div class="dashboard-header">
+        <div>
+            <h1>My Properties</h1>
+            <p style="color: var(--gray-500);">Manage all your rental properties</p>
+        </div>
+        <div class="actions">
+            <a href="{% url 'property_add' %}" class="btn btn-primary">+ Add Property</a>
+        </div>
+    </div>
+
+    {% if properties %}
+    <div class="property-grid">
+        {% for property in properties %}
+        <div class="property-card">
+            <div class="property-card-image">
+                {% if property.image %}
+                <img src="{{ property.image.url }}" alt="{{ property.name }}">
+                {% else %}
+                <span class="placeholder-icon">🏠</span>
+                {% endif %}
+            </div>
+            <div class="property-card-body">
+                <h4>{{ property.name }}</h4>
+                <p class="address">{{ property.address|truncatechars:50 }}</p>
+                {% if property.unit_number %}
+                <p style="color: var(--gray-500); font-size: 0.875rem;">Unit: {{ property.unit_number }}</p>
+                {% endif %}
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                    <span class="rent">{{ property.formatted_rent }}<span>/{{ property.get_rent_period_display }}</span></span>
+                    <span class="badge {% if property.is_occupied %}badge-occupied{% else %}badge-vacant{% endif %}">{% if property.is_occupied %}Occupied{% else %}Vacant{% endif %}</span>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline btn-sm">View</a>
+                    <a href="{% url 'property_edit' property.pk %}" class="btn btn-outline btn-sm">Edit</a>
+                    {% if not property.is_occupied %}
+                    <a href="{% url 'generate_invitation' property.pk %}" class="btn btn-primary btn-sm">Invite</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state card">
+        <div class="empty-state-icon">🏠</div>
+        <h3>No Properties Yet</h3>
+        <p>Add your first property to get started.</p>
+        <a href="{% url 'property_add' %}" class="btn btn-primary mt-2">+ Add Property</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

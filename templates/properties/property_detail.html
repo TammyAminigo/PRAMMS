@@ -1,0 +1,117 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ property.name }} - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="dashboard container">
+    <div class="dashboard-header">
+        <div>
+            <a href="{% url 'property_list' %}" style="color: var(--gray-500); font-size: 0.875rem;">← Back to Properties</a>
+            <h1 style="margin-top: 0.5rem;">{{ property.name }}</h1>
+            <p style="color: var(--gray-500);">{{ property.address }}</p>
+        </div>
+        <div class="actions">
+            <a href="{% url 'property_edit' property.pk %}" class="btn btn-outline">Edit Property</a>
+            {% if not property.is_occupied %}
+            <a href="{% url 'generate_invitation' property.pk %}" class="btn btn-primary">+ Invite Tenant</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Property Details Card -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Property Details</h3>
+            <span class="badge {% if property.is_occupied %}badge-occupied{% else %}badge-vacant{% endif %}">{% if property.is_occupied %}Occupied{% else %}Vacant{% endif %}</span>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Address</p>
+                    <p style="font-weight: 500;">{{ property.address }}</p>
+                </div>
+                {% if property.unit_number %}
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Unit Number</p>
+                    <p style="font-weight: 500;">{{ property.unit_number }}</p>
+                </div>
+                {% endif %}
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Rent ({{ property.get_rent_period_display }})</p>
+                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">{{ property.formatted_rent }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Added On</p>
+                    <p style="font-weight: 500;">{{ property.created_at|date:"M d, Y" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenant Info (if occupied) -->
+    {% if property.is_occupied %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Current Tenant</h3>
+            <a href="{% url 'tenant_delete' property.tenant.pk %}" class="btn btn-danger btn-sm">Remove Tenant</a>
+        </div>
+        <div class="card-body">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Name</p>
+                    <p style="font-weight: 500;">{{ property.tenant.user.get_full_name }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Email</p>
+                    <p style="font-weight: 500;">{{ property.tenant.user.email }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Phone</p>
+                    <p style="font-weight: 500;">{{ property.tenant.user.phone|default:"Not provided" }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Lease Start Date</p>
+                    <p style="font-weight: 500;">{{ property.tenant.move_in_date|date:"M d, Y" }}</p>
+                </div>
+                <div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Lease End Date</p>
+                    <p style="font-weight: 500; color: var(--warning);">{{ property.tenant.lease_end_date|date:"M d, Y" }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Active Invitations -->
+    {% if invitations %}
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Pending Invitations</h3>
+        </div>
+        <div class="card-body">
+            {% for invitation in invitations %}
+            <div style="padding: 1rem; background: var(--gray-100); border-radius: var(--radius); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                <div style="flex: 1;">
+                    <p style="font-size: 0.875rem; color: var(--gray-500);">Invitation Link (expires {{ invitation.expires_at|date:"M d, Y" }}):</p>
+                    <code style="word-break: break-all; font-size: 0.875rem;">{{ request.scheme }}://{{ request.get_host }}{% url 'accept_invitation' invitation.token %}</code>
+                    {% if invitation.tenant_email %}
+                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">Sent to: {{ invitation.tenant_email }}</p>
+                    {% endif %}
+                </div>
+                <form method="post" action="{% url 'invitation_delete' invitation.pk %}" style="flex-shrink: 0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this invitation?');">Cancel</button>
+                </form>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Delete Property -->
+    <div style="margin-top: 2rem; text-align: center;">
+        <a href="{% url 'property_delete' property.pk %}" class="btn btn-danger">Delete Property</a>
+        <p style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.5rem;">Permanently delete this property and all associated data.</p>
+    </div>
+</div>
+{% endblock %}

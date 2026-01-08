@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block title %}New Maintenance Request - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width: 560px;">
+        <h2>New Maintenance Request</h2>
+        <p class="subtitle">Report an issue at {{ property.name }}</p>
+
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="id_title">Issue Title</label>
+                {{ form.title }}
+                {% if form.title.errors %}
+                <p class="form-error">{{ form.title.errors.0 }}</p>
+                {% endif %}
+                <p class="form-help">Brief description of the issue (e.g., "Leaking faucet in bathroom")</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_description">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <p class="form-error">{{ form.description.errors.0 }}</p>
+                {% endif %}
+                <p class="form-help">Provide as much detail as possible about the issue</p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_priority">Priority Level</label>
+                {{ form.priority }}
+                <p class="form-help">
+                    <strong>Low:</strong> Cosmetic issues<br>
+                    <strong>Medium:</strong> Needs attention soon<br>
+                    <strong>High:</strong> Affects daily living<br>
+                    <strong>Emergency:</strong> Safety hazard or flooding
+                </p>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Photos (Optional, max 3)</label>
+                <input type="file" name="images" class="form-input" accept="image/*" multiple>
+                <p class="form-help">Upload 1-3 photos to help explain the issue</p>
+            </div>
+
+            <div style="display: flex; gap: 1rem;">
+                <button type="submit" class="btn btn-primary" style="flex: 1;">Submit Request</button>
+                <a href="{% url 'tenant_dashboard' %}" class="btn btn-outline" style="flex: 1;">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

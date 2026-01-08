@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Maintenance Requests - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="dashboard container">
+    <div class="dashboard-header">
+        <div>
+            <h1>Maintenance Requests</h1>
+            <p style="color: var(--gray-500);">{% if user.is_landlord %}View and manage requests from your tenants{% else %}Track your maintenance requests{% endif %}</p>
+        </div>
+        {% if user.is_tenant %}
+        <div class="actions">
+            <a href="{% url 'maintenance_create' %}" class="btn btn-primary">+ New Request</a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if maintenance_requests %}
+    <div class="request-list">
+        {% for request in maintenance_requests %}
+        <a href="{% url 'maintenance_detail' request.pk %}" class="request-item">
+            <div class="request-priority {{ request.priority }}"></div>
+            <div class="request-content">
+                <h4>{{ request.title }}</h4>
+                <p>{% if user.is_landlord %}{{ request.property.name }} • {{ request.tenant.get_full_name }}{% else %}{{ request.description|truncatechars:80 }}{% endif %}</p>
+            </div>
+            <div class="request-meta">
+                <span class="badge badge-{% if request.status == 'pending' %}warning{% elif request.status == 'completed' %}success{% elif request.status == 'in_progress' %}info{% else %}danger{% endif %}">{{ request.get_status_display }}</span>
+                <p class="mt-1">{{ request.created_at|timesince }} ago</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state card">
+        <div class="empty-state-icon">🔧</div>
+        <h3>No Maintenance Requests</h3>
+        {% if user.is_tenant %}
+        <p>Need something fixed? Submit a maintenance request.</p>
+        <a href="{% url 'maintenance_create' %}" class="btn btn-primary mt-2">+ New Request</a>
+        {% else %}
+        <p>Maintenance requests from your tenants will appear here.</p>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}Remove Tenant - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width: 500px;">
+        <div style="text-align: center; margin-bottom: 1.5rem;">
+            <span style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; background: rgba(255, 82, 82, 0.1); border-radius: 50%; font-size: 2rem;">⚠️</span>
+        </div>
+        
+        <h2 style="color: var(--danger); text-align: center;">Remove Tenant</h2>
+        <p class="subtitle" style="text-align: center;">Are you sure you want to remove this tenant?</p>
+
+        <div class="card" style="margin: 1.5rem 0; background: var(--gray-100);">
+            <div class="card-body">
+                <p style="color: var(--gray-500); font-size: 0.875rem;">Tenant</p>
+                <h4>{{ tenant_profile.user.get_full_name }}</h4>
+                <p style="color: var(--gray-500);">{{ tenant_profile.user.email }}</p>
+                
+                <hr style="margin: 1rem 0; border-color: var(--gray-200);">
+                
+                <p style="color: var(--gray-500); font-size: 0.875rem;">Property</p>
+                <p style="font-weight: 500;">{{ property.name }}</p>
+            </div>
+        </div>
+
+        <div class="alert alert-danger" style="position: static; margin-bottom: 1.5rem;">
+            <strong>Warning:</strong> This action will permanently delete:
+            <ul style="margin: 0.5rem 0 0 1.5rem;">
+                <li>The tenant's account</li>
+                <li>All maintenance requests from this tenant</li>
+            </ul>
+            <p style="margin-top: 0.5rem;">The property will be marked as <strong>vacant</strong>.</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 1rem;">
+                <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline" style="flex: 1;">Cancel</a>
+                <button type="submit" class="btn btn-danger" style="flex: 1;">Remove Tenant</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="dashboard container">
+    <div class="dashboard-header">
+        <div>
+            <h1>Welcome, {{ user.username }}!</h1>
+            <p style="color: var(--gray-500);">Here's an overview of your properties and recent activity.</p>
+        </div>
+        <div class="actions">
+            <a href="{% url 'property_add' %}" class="btn btn-primary">+ Add Property</a>
+        </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon primary">🏠</div>
+            <div class="stat-content">
+                <h3>{{ properties_count }}</h3>
+                <p>Total Properties</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon success">✓</div>
+            <div class="stat-content">
+                <h3>{{ occupied_count }}</h3>
+                <p>Occupied Units</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon warning">○</div>
+            <div class="stat-content">
+                <h3>{{ vacant_count }}</h3>
+                <p>Vacant Units</p>
+            </div>
+        </div>
+
+        <div class="stat-card">
+            <div class="stat-icon danger">🔧</div>
+            <div class="stat-content">
+                <h3>{{ pending_requests }}</h3>
+                <p>Pending Requests</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Properties Section -->
+    <h2 class="section-title">Your Properties</h2>
+
+    {% if properties %}
+    <div class="property-grid">
+        {% for property in properties %}
+        <div class="property-card">
+            <div class="property-card-image">
+                {% if property.image %}
+                <img src="{{ property.image.url }}" alt="{{ property.name }}">
+                {% else %}
+                <span class="placeholder-icon">🏠</span>
+                {% endif %}
+            </div>
+            <div class="property-card-body">
+                <h4>{{ property.name }}</h4>
+                <p class="address">{{ property.address|truncatechars:50 }}</p>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span class="rent">{{ property.formatted_rent }}<span>/{{ property.get_rent_period_display }}</span></span>
+                    <span class="badge {% if property.is_occupied %}badge-occupied{% else %}badge-vacant{% endif %}">{% if property.is_occupied %}Occupied{% else %}Vacant{% endif %}</span>
+                </div>
+                <div class="card-footer">
+                    <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline btn-sm">View Details</a>
+                    {% if not property.is_occupied %}
+                    <a href="{% url 'generate_invitation' property.pk %}" class="btn btn-primary btn-sm">Invite Tenant</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state card">
+        <div class="empty-state-icon">🏠</div>
+        <h3>No Properties Yet</h3>
+        <p>Start by adding your first property to the system.</p>
+        <a href="{% url 'property_add' %}" class="btn btn-primary mt-2">+ Add Property</a>
+    </div>
+    {% endif %}
+
+    <!-- Recent Maintenance Requests -->
+    <h2 class="section-title mt-4">Recent Maintenance Requests</h2>
+
+    {% if maintenance_requests %}
+    <div class="request-list">
+        {% for request in maintenance_requests %}
+        <a href="{% url 'maintenance_detail' request.pk %}" class="request-item">
+            <div class="request-priority {{ request.priority }}"></div>
+            <div class="request-content">
+                <h4>{{ request.title }}</h4>
+                <p>{{ request.property.name }} • {{ request.tenant.get_full_name }}</p>
+            </div>
+            <div class="request-meta">
+                <span class="badge badge-{% if request.status == 'pending' %}warning{% elif request.status == 'completed' %}success{% else %}info{% endif %}">{{ request.get_status_display }}</span>
+                <p class="mt-1">{{ request.created_at|timesince }} ago</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    <a href="{% url 'maintenance_list' %}" class="btn btn-outline mt-2">View All Requests</a>
+    {% else %}
+    <div class="empty-state card">
+        <div class="empty-state-icon">🔧</div>
+        <h3>No Maintenance Requests</h3>
+        <p>Maintenance requests from your tenants will appear here.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

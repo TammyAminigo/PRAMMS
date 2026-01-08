@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete {{ property.name }} - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="text-align: center;">
+        <div style="font-size: 4rem; margin-bottom: 1rem;">⚠️</div>
+        <h2>Delete Property?</h2>
+        <p class="subtitle">This action cannot be undone.</p>
+
+        <div class="card" style="text-align: left; margin: 1.5rem 0;">
+            <h4>{{ property.name }}</h4>
+            <p style="color: var(--gray-500);">{{ property.address }}</p>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; gap: 1rem;">
+                <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline" style="flex: 1;">Cancel</a>
+                <button type="submit" class="btn btn-danger" style="flex: 1;">Delete Property</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

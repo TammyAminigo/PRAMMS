@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+
+{% block title %}Register as Landlord - PRAMMS{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card">
+        <h2>Create Your Account</h2>
+        <p class="subtitle">Register as a landlord to start managing your properties</p>
+
+        <form method="post" novalidate>
+            {% csrf_token %}
+
+            <div class="form-group">
+                <label class="form-label" for="id_username">Username</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                <p class="form-error">{{ form.username.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_email">Email</label>
+                {{ form.email }}
+                {% if form.email.errors %}
+                <p class="form-error">{{ form.email.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="id_first_name">First Name</label>
+                    {{ form.first_name }}
+                    {% if form.first_name.errors %}
+                    <p class="form-error">{{ form.first_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="id_last_name">Last Name</label>
+                    {{ form.last_name }}
+                    {% if form.last_name.errors %}
+                    <p class="form-error">{{ form.last_name.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_phone">Phone (Optional)</label>
+                {{ form.phone }}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_password1">Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password1" id="id_password1" class="form-input"
+                        placeholder="Create a strong password" autocomplete="new-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('id_password1', this)">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                {% if form.password1.errors %}
+                <p class="form-error">{{ form.password1.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
+                <label class="form-label" for="id_password2">Confirm Password</label>
+                <div class="password-wrapper">
+                    <input type="password" name="password2" id="id_password2" class="form-input"
+                        placeholder="Confirm your password" autocomplete="new-password">
+                    <button type="button" class="password-toggle" onclick="togglePassword('id_password2', this)">
+                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                    </button>
+                </div>
+                {% if form.password2.errors %}
+                <p class="form-error">{{ form.password2.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Create Account</button>
+        </form>
+
+        <p class="auth-footer">
+            Already have an account? <a href="{% url 'login' %}">Login here</a>
+        </p>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-wrapper .form-input {
+        padding-right: 50px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-500);
+        transition: color 0.2s;
+    }
+
+    .password-toggle:hover {
+        color: var(--accent);
+    }
+
+    .eye-icon {
+        width: 22px;
+        height: 22px;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const eyeIcon = button.querySelector('.eye-icon');
+
+        if (input.type === 'password') {
+            input.type = 'text';
+            // Change to eye-off icon
+            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+        } else {
+            input.type = 'password';
+            // Change back to eye icon
+            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+        }
+    }
+
+    // Store passwords before form submission to preserve them on error
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.querySelector('form');
+        const password1 = document.getElementById('id_password1');
+        const password2 = document.getElementById('id_password2');
+
+        // Restore passwords from sessionStorage if they exist (after error reload)
+        const savedPassword1 = sessionStorage.getItem('register_password1');
+        const savedPassword2 = sessionStorage.getItem('register_password2');
+
+        if (savedPassword1 && password1) {
+            password1.value = savedPassword1;
+            sessionStorage.removeItem('register_password1');
+        }
+        if (savedPassword2 && password2) {
+            password2.value = savedPassword2;
+            sessionStorage.removeItem('register_password2');
+        }
+
+        // Save passwords before form submission
+        if (form) {
+            form.addEventListener('submit', function () {
+                if (password1) {
+                    sessionStorage.setItem('register_password1', password1.value);
+                }
+                if (password2) {
+                    sessionStorage.setItem('register_password2', password2.value);
+                }
+            });
+        }
+
+        // Scroll to first error if present (instead of scrolling to top)
+        const firstError = document.querySelector('.form-error');
+        if (firstError) {
+            // Get the parent form-group of the error
+            const errorGroup = firstError.closest('.form-group') || firstError.parentElement;
+            if (errorGroup) {
+                // Scroll to the error with some offset from the top
+                setTimeout(function () {
+                    const rect = errorGroup.getBoundingClientRect();
+                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+                    const targetY = scrollTop + rect.top - 120; // 120px offset from top
+                    window.scrollTo({ top: targetY, behavior: 'smooth' });
+                }, 100);
+            }
+        }
+    });
+</script>
+{% endblock %}
