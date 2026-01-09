@@ -11,7 +11,13 @@ class User(AbstractUser):
         ('tenant', 'Tenant'),
     ]
     
+    GENDER_CHOICES = [
+        ('male', 'Male'),
+        ('female', 'Female'),
+    ]
+    
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='landlord')
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     phone = models.CharField(max_length=20, blank=True)
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     

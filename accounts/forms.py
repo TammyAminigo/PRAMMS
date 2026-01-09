@@ -37,10 +37,17 @@ class LandlordRegistrationForm(UserCreationForm):
             'placeholder': 'Phone number (optional)'
         })
     )
+    gender = forms.ChoiceField(
+        choices=User.GENDER_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={
+            'class': 'form-input'
+        })
+    )
     
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'password1', 'password2']
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'gender', 'password1', 'password2']
         widgets = {
             'username': forms.TextInput(attrs={
                 'class': 'form-input',
@@ -102,6 +109,13 @@ class TenantRegistrationForm(UserCreationForm):
             'placeholder': 'Phone number (optional)'
         })
     )
+    gender = forms.ChoiceField(
+        choices=User.GENDER_CHOICES,
+        required=True,
+        widget=forms.Select(attrs={
+            'class': 'form-input'
+        })
+    )
     move_in_date = forms.DateField(
         required=True,
         widget=forms.DateInput(attrs={
@@ -112,7 +126,7 @@ class TenantRegistrationForm(UserCreationForm):
     
     class Meta:
         model = User
-        fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'password1', 'password2']
+        fields = ['username', 'email', 'first_name', 'last_name', 'phone', 'gender', 'password1', 'password2']
         widgets = {
             'username': forms.TextInput(attrs={
                 'class': 'form-input',

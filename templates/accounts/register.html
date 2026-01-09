@@ -51,6 +51,14 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label" for="id_gender">Gender</label>
+                {{ form.gender }}
+                {% if form.gender.errors %}
+                <p class="form-error">{{ form.gender.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
                 <label class="form-label" for="id_password1">Password</label>
                 <div class="password-wrapper">
                     <input type="password" name="password1" id="id_password1" class="form-input"
