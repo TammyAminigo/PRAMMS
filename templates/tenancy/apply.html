@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Apply for {{ property.name }} - Propz{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="container">
+        <div style="margin-bottom: 1.5rem;">
+            <a href="{% url 'marketplace_detail' pk=property.pk %}" style="color: var(--accent); font-weight: 500;">←
+                Back to Property</a>
+        </div>
+
+        <div style="max-width: 640px; margin: 0 auto;">
+            <div class="card">
+                <h2 style="margin-bottom: 0.5rem;">Apply for Property</h2>
+                <p style="color: var(--gray-500); margin-bottom: 2rem;">Express your interest in <strong>{{ property.name  }}</strong></p>
+
+                <!-- Property Summary -->
+                <div
+                    style="background: var(--gray-100); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 2rem;">
+                    <h4>{{ property.name }}</h4>
+                    <p style="color: var(--gray-500); font-size: 0.875rem;"><i data-lucide="map-pin" class="icon-xs"></i> {{ property.address }}</p>
+                    <p style="color: var(--accent); font-weight: 700; font-size: 1.25rem; margin-top: 0.5rem;">
+                        ₦{{ property.rent_amount|floatformat:"0" }} / {{ property.get_rent_period_display }}
+                    </p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_move_in_date">Preferred Move-in Date</label>
+                        {{ form.move_in_date }}
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="id_message">Message to Landlord</label>
+                        {{ form.message }}
+                        <p class="form-help">Introduce yourself and explain why you're interested in this property.</p>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-lg" style="width: 100%;">
+                        Submit Application
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

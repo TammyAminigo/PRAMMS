@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Property, TenantProfile, InvitationLink
-from prmms.admin_site import pramms_admin_site
+from prmms.admin_site import propz_admin_site
 
 
 class PropertyAdmin(admin.ModelAdmin):
@@ -24,7 +24,7 @@ class InvitationLinkAdmin(admin.ModelAdmin):
 
 
 # Register with custom admin site
-pramms_admin_site.register(Property, PropertyAdmin)
-pramms_admin_site.register(TenantProfile, TenantProfileAdmin)
-pramms_admin_site.register(InvitationLink, InvitationLinkAdmin)
+propz_admin_site.register(Property, PropertyAdmin)
+propz_admin_site.register(TenantProfile, TenantProfileAdmin)
+propz_admin_site.register(InvitationLink, InvitationLinkAdmin)
 

@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
-{% block title %}My Properties - PRAMMS{% endblock %}
+{% block title %}My Properties - Propz{% endblock %}
 
 {% block content %}
 <div class="dashboard container">
@@ -19,10 +20,11 @@
         {% for property in properties %}
         <div class="property-card">
             <div class="property-card-image">
-                {% if property.image %}
-                <img src="{{ property.image.url }}" alt="{{ property.name }}">
+                {% if property.photo %}
+                <img src="{{ property.photo.url }}" alt="{{ property.name }}"
+                    style="width:100%;height:100%;object-fit:cover;">
                 {% else %}
-                <span class="placeholder-icon">🏠</span>
+                <span class="placeholder-icon"><i data-lucide="house" class="icon-md"></i></span>
                 {% endif %}
             </div>
             <div class="property-card-body">
@@ -32,15 +34,12 @@
                 <p style="color: var(--gray-500); font-size: 0.875rem;">Unit: {{ property.unit_number }}</p>
                 {% endif %}
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
-                    <span class="rent">{{ property.formatted_rent }}<span>/{{ property.get_rent_period_display }}</span></span>
+                    <span class="rent">{{ property.formatted_rent }}<span>/ {{ property.get_rent_period_display }}</span></span>
                     <span class="badge {% if property.is_occupied %}badge-occupied{% else %}badge-vacant{% endif %}">{% if property.is_occupied %}Occupied{% else %}Vacant{% endif %}</span>
                 </div>
                 <div class="card-footer">
                     <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline btn-sm">View</a>
                     <a href="{% url 'property_edit' property.pk %}" class="btn btn-outline btn-sm">Edit</a>
-                    {% if not property.is_occupied %}
-                    <a href="{% url 'generate_invitation' property.pk %}" class="btn btn-primary btn-sm">Invite</a>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -48,7 +47,7 @@
     </div>
     {% else %}
     <div class="empty-state card">
-        <div class="empty-state-icon">🏠</div>
+        <div class="empty-state-icon"><i data-lucide="house" class="icon-md"></i></div>
         <h3>No Properties Yet</h3>
         <p>Add your first property to get started.</p>
         <a href="{% url 'property_add' %}" class="btn btn-primary mt-2">+ Add Property</a>

@@ -39,12 +39,12 @@ class EmailOrUsernameAuthenticationForm(AuthenticationForm):
         return username_or_email
 
 
-class PRAMMSAdminSite(AdminSite):
-    """Custom admin site for PRAMMS with email login support."""
+class PropzAdminSite(AdminSite):
+    """Custom admin site for Propz with email login support."""
     
-    site_header = 'PRAMMS Administration'
-    site_title = 'PRAMMS Admin'
-    index_title = 'Property Rental and Maintenance Management'
+    site_header = 'Propz Administration'
+    site_title = 'Propz Admin'
+    index_title = 'Property Marketplace & Management'
     login_form = EmailOrUsernameAuthenticationForm
     
     def login(self, request, extra_context=None):
@@ -55,4 +55,4 @@ class PRAMMSAdminSite(AdminSite):
 
 
 # Create custom admin site instance
-pramms_admin_site = PRAMMSAdminSite(name='pramms_admin')
+propz_admin_site = PropzAdminSite(name='propz_admin')

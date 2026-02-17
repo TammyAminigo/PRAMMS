@@ -1,83 +1,149 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
-{% block title %}My Dashboard - PRAMMS{% endblock %}
+{% block title %}Tenant Dashboard - Propz{% endblock %}
 
 {% block content %}
-<div class="dashboard container">
-    <div class="dashboard-header">
+<section class="dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Welcome, {{ user.first_name }}! </h1>
+            <a href="{% url 'marketplace_list' %}" class="btn btn-primary"><i data-lucide="home" class="icon-md"></i>
+                Browse Marketplace</a>
+        </div>
+
+        {% if active_tenancy %}
+        <!-- Active Tenancy Info -->
+        <div style="margin-bottom: 2rem;">
+            <h2 class="section-title"><i data-lucide="key-round" class="icon-md"></i> Your Active Tenancy</h2>
+            <div class="card" style="border-left: 4px solid var(--accent);">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
+                    <div style="flex: 1;">
+                        <h3 style="margin-bottom: 0.5rem;">{{ property.name }}</h3>
+                        <p style="color: var(--gray-500); margin-bottom: 0.75rem;"><i data-lucide="map-pin"
+                                class="icon-xs"></i> {{ property.address }}</p>
+                        <p style="color: var(--primary); font-weight: 700; font-size: 1.5rem;">
+                            ₦{{ property.rent_amount|floatformat:"0"|intcomma }}
+                            <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-500);">/ {{
+                                property.get_rent_period_display }}</span>
+                        </p>
+                    </div>
+                    <div style="text-align: center; min-width: 120px;">
+                        {% if active_tenancy.days_remaining is not None %}
+                        <div
+                            style="font-size: 2.5rem; font-weight: 700; color: {% if active_tenancy.days_remaining < 30 %}var(--danger){% elif active_tenancy.days_remaining < 90 %}var(--warning){% else %}var(--accent){% endif %};">
+                            {{ active_tenancy.days_remaining }}
+                        </div>
+                        <p style="color: var(--gray-500); font-size: 0.875rem;">days remaining</p>
+                        {% endif %}
+                        {% if active_tenancy.status == 'pending_termination' %}
+                        <span class="badge badge-warning" style="margin-top: 0.5rem;">Pending Termination</span>
+                        {% else %}
+                        <span class="badge badge-success" style="margin-top: 0.5rem;">Active</span>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="card-footer" style="margin-top: 1.5rem;">
+                    <a href="{% url 'tenancy_detail' pk=active_tenancy.pk %}" class="btn btn-outline btn-sm">View
+                        Details</a>
+                    <a href="{% url 'maintenance_create' %}" class="btn btn-outline btn-sm">Report Issue</a>
+                    {% if active_tenancy.status == 'active' %}
+                    <a href="{% url 'terminate_tenancy' pk=active_tenancy.pk %}" class="btn btn-danger btn-sm">Request
+                        Termination</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Landlord Info -->
+        <div style="margin-bottom: 2rem;">
+            <h2 class="section-title"><i data-lucide="building-2" class="icon-md"></i> Your Landlord</h2>
+            <div class="card">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <div
+                        style="width: 48px; height: 48px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.2rem;">
+                        {{ active_tenancy.landlord.first_name.0 }}{{ active_tenancy.landlord.last_name.0 }}
+                    </div>
+                    <div>
+                        <p style="font-weight: 600;">{{ active_tenancy.landlord.get_full_name }}</p>
+                        <p style="color: var(--gray-500); font-size: 0.875rem;">{{ active_tenancy.landlord.email }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <!-- No Active Tenancy -->
+        <div class="empty-state" style="margin-bottom: 2rem;">
+            <div class="empty-state-icon"><i data-lucide="house" class="icon-md"></i></div>
+            <h3>No Active Tenancy</h3>
+            <p>Browse the marketplace to find your next home and apply.</p>
+            <a href="{% url 'marketplace_list' %}" class="btn btn-primary" style="margin-top: 1rem;"><i
+                    data-lucide="home" class="icon-md"></i> Browse
+                Marketplace</a>
+        </div>
+        {% endif %}
+
+        <!-- Pending Applications -->
+        {% if pending_applications %}
+        <div style="margin-bottom: 2rem;">
+            <h2 class="section-title"><i data-lucide="clipboard-list" class="icon-md"></i> Your Pending Applications
+            </h2>
+            <div class="request-list">
+                {% for app in pending_applications %}
+                <div class="card" style="margin-bottom: 0.75rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div style="flex: 1;">
+                            <p style="font-weight: 600;">{{ app.rental_property.name }}</p>
+                            <p style="color: var(--gray-500); font-size: 0.8rem;"><i data-lucide="map-pin"
+                                    class="icon-xs"></i> {{ app.rental_property.address }}
+                            </p>
+                            <p style="color: var(--gray-400); font-size: 0.75rem; margin-top: 0.25rem;">Applied {{
+                                app.created_at|timesince }} ago</p>
+                            {% if app.landlord_reply %}
+                            <div
+                                style="background: rgba(76, 175, 80, 0.08); border-left: 3px solid var(--accent); padding: 0.5rem 0.75rem; border-radius: 0 var(--radius) var(--radius) 0; margin-top: 0.5rem;">
+                                <p
+                                    style="font-size: 0.75rem; font-weight: 600; color: var(--accent); margin-bottom: 0.25rem;">
+                                    Landlord's Reply:</p>
+                                <p style="font-size: 0.85rem; color: var(--gray-600);">{{ app.landlord_reply }}</p>
+                            </div>
+                            {% endif %}
+                        </div>
+                        <span class="badge badge-warning">Pending Review</span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Maintenance Requests -->
+        {% if maintenance_requests %}
         <div>
-            <h1>Welcome, {{ user.username }}!</h1>
-            <p style="color: var(--gray-500);">View your property details and maintenance requests.</p>
-        </div>
-        <div class="actions">
-            <a href="{% url 'maintenance_create' %}" class="btn btn-primary">+ New Request</a>
-        </div>
-    </div>
-
-    <!-- Property Info -->
-    {% if property %}
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">Your Property</h3>
-            <span class="badge badge-success">Active Lease</span>
-        </div>
-        <div class="card-body">
-            <h4 style="margin-bottom: 0.5rem;">{{ property.name }}</h4>
-            <p style="color: var(--gray-500); margin-bottom: 1rem;">{{ property.address }}</p>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1.5rem;">
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem;">Rent ({{ property.get_rent_period_display }})</p>
-                    <p style="font-size: 1.5rem; font-weight: 600; color: var(--accent);">{{ property.formatted_rent }}</p>
-                </div>
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem;">Lease Start Date</p>
-                    <p style="font-size: 1.25rem; font-weight: 500;">{{ tenant_profile.move_in_date|date:"M d, Y" }}</p>
-                </div>
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem;">Lease End Date</p>
-                    <p style="font-size: 1.25rem; font-weight: 500; color: var(--warning);">{{ tenant_profile.lease_end_date|date:"M d, Y" }}</p>
-                </div>
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem;">Landlord</p>
-                    <p style="font-size: 1.25rem; font-weight: 500;">{{ tenant_profile.landlord.get_full_name }}</p>
-                </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 class="section-title" style="margin-bottom: 0;"><i data-lucide="wrench" class="icon-md"></i>
+                    Maintenance Requests</h2>
+                <a href="{% url 'maintenance_create' %}" class="btn btn-outline btn-sm">+ New Request</a>
+            </div>
+            <div class="request-list">
+                {% for request in maintenance_requests %}
+                <a href="{% url 'maintenance_detail' pk=request.pk %}" class="request-item"
+                    style="text-decoration: none; color: inherit;">
+                    <div class="request-priority {{ request.priority }}"></div>
+                    <div class="request-content">
+                        <h4>{{ request.title }}</h4>
+                        <p>{{ request.created_at|timesince }} ago</p>
+                    </div>
+                    <div class="request-meta">
+                        <span class="badge badge-{{ request.status }}">{{ request.get_status_display }}</span>
+                    </div>
+                </a>
+                {% endfor %}
             </div>
         </div>
+        {% endif %}
     </div>
-    {% else %}
-    <div class="alert alert-warning" style="position: static; margin-bottom: 1.5rem;">
-        You are not currently assigned to a property. Please contact your landlord.
-    </div>
-    {% endif %}
-
-    <!-- Maintenance Requests -->
-    <h2 class="section-title">Recent Maintenance Requests</h2>
-
-    {% if maintenance_requests %}
-    <div class="request-list">
-        {% for request in maintenance_requests|slice:":5" %}
-        <a href="{% url 'maintenance_detail' request.pk %}" class="request-item">
-            <div class="request-priority {{ request.priority }}"></div>
-            <div class="request-content">
-                <h4>{{ request.title }}</h4>
-                <p>{{ request.description|truncatechars:60 }}</p>
-            </div>
-            <div class="request-meta">
-                <span class="badge badge-{% if request.status == 'pending' %}warning{% elif request.status == 'completed' %}success{% else %}info{% endif %}">{{ request.get_status_display }}</span>
-                <p class="mt-1">{{ request.created_at|timesince }} ago</p>
-            </div>
-        </a>
-        {% endfor %}
-    </div>
-    <a href="{% url 'maintenance_list' %}" class="btn btn-outline mt-2">View All Requests</a>
-    {% else %}
-    <div class="empty-state card">
-        <div class="empty-state-icon">🔧</div>
-        <h3>No Maintenance Requests</h3>
-        <p>Need something fixed? Submit a maintenance request.</p>
-        <a href="{% url 'maintenance_create' %}" class="btn btn-primary mt-2">+ New Request</a>
-    </div>
-    {% endif %}
-</div>
+</section>
 {% endblock %}

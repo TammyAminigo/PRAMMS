@@ -1,15 +1,16 @@
 {% extends 'base.html' %}
 
-{% block title %}Register as Landlord - PRAMMS{% endblock %}
+{% block title %}Create Account - Propz{% endblock %}
 
 {% block content %}
 <div class="auth-container">
     <div class="auth-card">
-        <h2>Create Your Account</h2>
-        <p class="subtitle">Register as a landlord to start managing your properties</p>
+        <h2>Create Your Propz Account</h2>
+        <p class="subtitle">Join thousands of property seekers and providers</p>
 
         <form method="post" novalidate>
             {% csrf_token %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
             <div class="form-group">
                 <label class="form-label" for="id_username">Username</label>
@@ -45,17 +46,18 @@
                 </div>
             </div>
 
-            <div class="form-group">
-                <label class="form-label" for="id_phone">Phone (Optional)</label>
-                {{ form.phone }}
-            </div>
-
-            <div class="form-group">
-                <label class="form-label" for="id_gender">Gender</label>
-                {{ form.gender }}
-                {% if form.gender.errors %}
-                <p class="form-error">{{ form.gender.errors.0 }}</p>
-                {% endif %}
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label class="form-label" for="id_phone">Phone (Optional)</label>
+                    {{ form.phone }}
+                </div>
+                <div class="form-group">
+                    <label class="form-label" for="id_gender">Gender</label>
+                    {{ form.gender }}
+                    {% if form.gender.errors %}
+                    <p class="form-error">{{ form.gender.errors.0 }}</p>
+                    {% endif %}
+                </div>
             </div>
 
             <div class="form-group">
@@ -64,10 +66,7 @@
                     <input type="password" name="password1" id="id_password1" class="form-input"
                         placeholder="Create a strong password" autocomplete="new-password">
                     <button type="button" class="password-toggle" onclick="togglePassword('id_password1', this)">
-                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
+                        <i data-lucide="eye" class="icon-sm"></i>
                     </button>
                 </div>
                 {% if form.password1.errors %}
@@ -81,10 +80,7 @@
                     <input type="password" name="password2" id="id_password2" class="form-input"
                         placeholder="Confirm your password" autocomplete="new-password">
                     <button type="button" class="password-toggle" onclick="togglePassword('id_password2', this)">
-                        <svg class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                            <circle cx="12" cy="12" r="3"></circle>
-                        </svg>
+                        <i data-lucide="eye" class="icon-sm"></i>
                     </button>
                 </div>
                 {% if form.password2.errors %}
@@ -96,7 +92,7 @@
         </form>
 
         <p class="auth-footer">
-            Already have an account? <a href="{% url 'login' %}">Login here</a>
+            Already have an account? <a href="{% url 'login' %}">Sign in here</a>
         </p>
     </div>
 </div>
@@ -131,11 +127,6 @@
     .password-toggle:hover {
         color: var(--accent);
     }
-
-    .eye-icon {
-        width: 22px;
-        height: 22px;
-    }
 </style>
 {% endblock %}
 
@@ -143,64 +134,39 @@
 <script>
     function togglePassword(inputId, button) {
         const input = document.getElementById(inputId);
-        const eyeIcon = button.querySelector('.eye-icon');
-
+        const icon = button.querySelector('[data-lucide]');
         if (input.type === 'password') {
             input.type = 'text';
-            // Change to eye-off icon
-            eyeIcon.innerHTML = '<path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path><line x1="1" y1="1" x2="23" y2="23"></line>';
+            icon.setAttribute('data-lucide', 'eye-off');
         } else {
             input.type = 'password';
-            // Change back to eye icon
-            eyeIcon.innerHTML = '<path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle>';
+            icon.setAttribute('data-lucide', 'eye');
         }
+        lucide.createIcons();
     }
 
-    // Store passwords before form submission to preserve them on error
-    document.addEventListener('DOMContentLoaded', function () {
+    // Preserve passwords on validation error
+    document.addEventListener('DOMContentLoaded', function() {
         const form = document.querySelector('form');
-        const password1 = document.getElementById('id_password1');
-        const password2 = document.getElementById('id_password2');
-
-        // Restore passwords from sessionStorage if they exist (after error reload)
-        const savedPassword1 = sessionStorage.getItem('register_password1');
-        const savedPassword2 = sessionStorage.getItem('register_password2');
-
-        if (savedPassword1 && password1) {
-            password1.value = savedPassword1;
-            sessionStorage.removeItem('register_password1');
-        }
-        if (savedPassword2 && password2) {
-            password2.value = savedPassword2;
-            sessionStorage.removeItem('register_password2');
-        }
-
-        // Save passwords before form submission
+        const pw1 = document.getElementById('id_password1');
+        const pw2 = document.getElementById('id_password2');
+        const s1 = sessionStorage.getItem('reg_pw1');
+        const s2 = sessionStorage.getItem('reg_pw2');
+        if (s1 && pw1) { pw1.value = s1; sessionStorage.removeItem('reg_pw1'); }
+        if (s2 && pw2) { pw2.value = s2; sessionStorage.removeItem('reg_pw2'); }
         if (form) {
-            form.addEventListener('submit', function () {
-                if (password1) {
-                    sessionStorage.setItem('register_password1', password1.value);
-                }
-                if (password2) {
-                    sessionStorage.setItem('register_password2', password2.value);
-                }
+            form.addEventListener('submit', function() {
+                if (pw1) sessionStorage.setItem('reg_pw1', pw1.value);
+                if (pw2) sessionStorage.setItem('reg_pw2', pw2.value);
             });
         }
-
-        // Scroll to first error if present (instead of scrolling to top)
-        const firstError = document.querySelector('.form-error');
-        if (firstError) {
-            // Get the parent form-group of the error
-            const errorGroup = firstError.closest('.form-group') || firstError.parentElement;
-            if (errorGroup) {
-                // Scroll to the error with some offset from the top
-                setTimeout(function () {
-                    const rect = errorGroup.getBoundingClientRect();
-                    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-                    const targetY = scrollTop + rect.top - 120; // 120px offset from top
-                    window.scrollTo({ top: targetY, behavior: 'smooth' });
-                }, 100);
-            }
+        // Scroll to first error
+        const err = document.querySelector('.form-error');
+        if (err) {
+            const g = err.closest('.form-group') || err.parentElement;
+            if (g) setTimeout(() => {
+                window.scrollTo({ top: g.getBoundingClientRect().top + window.pageYOffset - 120, behavior: 'smooth' });
+            }, 100);
         }
     });
 </script>

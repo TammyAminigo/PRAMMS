@@ -2,11 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login, authenticate
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LogoutView
-from django.views.generic import CreateView, TemplateView
+from django.views.generic import TemplateView
 from django.urls import reverse_lazy
 from django.contrib import messages
 
-from .forms import LandlordRegistrationForm, CustomLoginForm
+from .forms import UnifiedRegistrationForm, CustomLoginForm, ProfilePictureForm, ContactSettingsForm
 from .models import User
 
 
@@ -20,75 +20,127 @@ class HomeView(TemplateView):
         return super().get(request, *args, **kwargs)
 
 
-class LandlordRegisterView(CreateView):
-    """Registration view for Landlords only."""
-    model = User
-    form_class = LandlordRegistrationForm
-    template_name = 'accounts/register.html'
-    success_url = reverse_lazy('dashboard')
-    
-    def dispatch(self, request, *args, **kwargs):
-        if request.user.is_authenticated:
-            return redirect('dashboard')
-        return super().dispatch(request, *args, **kwargs)
-    
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        login(self.request, self.object)
-        messages.success(self.request, f'Welcome, {self.object.first_name}! Your landlord account has been created.')
-        return response
+# =============================================
+# Unified Registration Flow
+# =============================================
 
-
-def login_choice(request):
-    """Login role selection page."""
+def unified_register(request):
+    """Step 1: Single registration form for all users."""
     if request.user.is_authenticated:
         return redirect('dashboard')
-    return render(request, 'accounts/login_choice.html')
+    
+    # Preserve ?next= parameter through the flow
+    next_url = request.GET.get('next', '')
+    
+    if request.method == 'POST':
+        form = UnifiedRegistrationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            # Store next_url in session for choose_role to use
+            if next_url:
+                request.session['registration_next'] = next_url
+            elif request.POST.get('next'):
+                request.session['registration_next'] = request.POST.get('next')
+            return redirect('choose_role')
+    else:
+        form = UnifiedRegistrationForm()
+    
+    return render(request, 'accounts/register.html', {
+        'form': form,
+        'next': next_url,
+    })
+
+
+@login_required
+def choose_role(request):
+    """Step 2: Role selection with visual cards."""
+    user = request.user
+    next_url = request.session.pop('registration_next', '')
+    
+    if request.method == 'POST':
+        role = request.POST.get('role', 'tenant')
+        if role in ('landlord', 'tenant'):
+            user.role = role
+            user.save()
+        
+        if role == 'landlord':
+            messages.success(
+                request,
+                f'Welcome, {user.first_name}! Let\'s get your first property listed for the market.'
+            )
+            # If they came from "Post Property", send them to add property
+            if next_url:
+                return redirect(next_url)
+            return redirect('landlord_dashboard')
+        else:
+            messages.success(
+                request,
+                f'Welcome to Propz, {user.first_name}! Start your search for verified properties here.'
+            )
+            return redirect('marketplace_list')
+    
+    return render(request, 'accounts/choose_role.html', {
+        'next': next_url,
+    })
+
+
+# =============================================
+# Unified Login
+# =============================================
+
+def unified_login(request):
+    """Single login page for all roles."""
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+    
+    next_url = request.GET.get('next', '')
+    
+    if request.method == 'POST':
+        form = CustomLoginForm(request, data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
+            login(request, user)
+            messages.success(request, f'Welcome back, {user.first_name}!')
+            
+            # Redirect to ?next= if provided
+            post_next = request.POST.get('next', '')
+            if post_next:
+                return redirect(post_next)
+            
+            # Otherwise redirect based on role
+            return redirect('dashboard')
+    else:
+        form = CustomLoginForm()
+    
+    return render(request, 'accounts/login.html', {
+        'form': form,
+        'next': next_url,
+    })
+
+
+# =============================================
+# Legacy Login Views (backward compatibility)
+# =============================================
+
+def login_choice(request):
+    """Login role selection page — now redirects to unified login."""
+    return redirect('login')
 
 
 def landlord_login(request):
-    """Landlord-specific login view."""
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-    
-    if request.method == 'POST':
-        form = CustomLoginForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            if user.is_landlord:
-                login(request, user)
-                messages.success(request, f'Welcome back, {user.first_name}!')
-                return redirect('landlord_dashboard')
-            else:
-                messages.error(request, 'This account is not registered as a landlord. Please use the tenant login.')
-                return redirect('tenant_login')
-    else:
-        form = CustomLoginForm()
-    
-    return render(request, 'accounts/landlord_login.html', {'form': form})
+    """Landlord-specific login — now redirects to unified login."""
+    return redirect('login')
 
 
 def tenant_login(request):
-    """Tenant-specific login view."""
-    if request.user.is_authenticated:
-        return redirect('dashboard')
-    
-    if request.method == 'POST':
-        form = CustomLoginForm(request, data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
-            if user.is_tenant:
-                login(request, user)
-                messages.success(request, f'Welcome back, {user.first_name}!')
-                return redirect('tenant_dashboard')
-            else:
-                messages.error(request, 'This account is not registered as a tenant. Please use the landlord login.')
-                return redirect('landlord_login')
-    else:
-        form = CustomLoginForm()
-    
-    return render(request, 'accounts/tenant_login.html', {'form': form})
+    """Tenant-specific login — now redirects to unified login."""
+    return redirect('login')
 
+
+# =============================================
+# Logout
+# =============================================
 
 class CustomLogoutView(LogoutView):
     """Logout view."""
@@ -99,6 +151,10 @@ class CustomLogoutView(LogoutView):
             messages.info(request, 'You have been logged out.')
         return super().dispatch(request, *args, **kwargs)
 
+
+# =============================================
+# Dashboard Routing
+# =============================================
 
 @login_required
 def dashboard_view(request):
@@ -117,77 +173,136 @@ def dashboard_view(request):
 
 @login_required
 def landlord_dashboard(request):
-    """Landlord dashboard showing properties and maintenance requests."""
-    if not request.user.is_landlord:
+    """Landlord dashboard showing properties, tenancies, and applications."""
+    user = request.user
+    if not user.is_landlord:
         messages.error(request, 'Access denied. Landlord account required.')
         return redirect('dashboard')
     
-    properties = request.user.properties.all()
-    
-    # Get all maintenance requests for landlord's properties
+    from properties.models import Property
+    from tenancy.models import Tenancy, TenancyApplication
     from maintenance.models import MaintenanceRequest
+    
+    properties = Property.objects.filter(landlord=user)
+    properties_count = properties.count()
+    occupied_count = properties.filter(is_available=False).count()
+    vacant_count = properties.filter(is_available=True).count()
+    
+    # Pending maintenance requests
+    pending_requests = MaintenanceRequest.objects.filter(
+        property__landlord=user,
+        status='pending'
+    ).count()
+    
+    # Recent maintenance requests
     maintenance_requests = MaintenanceRequest.objects.filter(
-        property__landlord=request.user
+        property__landlord=user,
     ).order_by('-created_at')[:5]
     
+    # Active tenancies
+    active_tenancies = Tenancy.objects.filter(
+        rental_property__landlord=user,
+        status='active'
+    ).select_related('tenant', 'rental_property')[:3]
+    
+    # Pending applications
+    pending_applications = TenancyApplication.objects.filter(
+        rental_property__landlord=user,
+        status='pending'
+    ).select_related('tenant', 'rental_property').order_by('-created_at')
+    pending_applications_count = pending_applications.count()
+    
     context = {
-        'properties': properties,
-        'properties_count': properties.count(),
-        'occupied_count': properties.filter(is_occupied=True).count(),
-        'vacant_count': properties.filter(is_occupied=False).count(),
+        'properties_count': properties_count,
+        'occupied_count': occupied_count,
+        'vacant_count': vacant_count,
+        'pending_requests': pending_requests,
         'maintenance_requests': maintenance_requests,
-        'pending_requests': MaintenanceRequest.objects.filter(
-            property__landlord=request.user,
-            status='pending'
-        ).count(),
+        'active_tenancies': active_tenancies,
+        'pending_applications': pending_applications,
+        'pending_applications_count': pending_applications_count,
     }
     return render(request, 'accounts/landlord_dashboard.html', context)
 
 
 @login_required
 def tenant_dashboard(request):
-    """Tenant dashboard showing their property and maintenance requests."""
-    if not request.user.is_tenant:
+    """Tenant dashboard showing their tenancy, property, and maintenance requests."""
+    user = request.user
+    if not user.is_tenant:
         messages.error(request, 'Access denied. Tenant account required.')
         return redirect('dashboard')
     
-    try:
-        tenant_profile = request.user.tenant_profile
-        property_info = tenant_profile.rental_property
-    except:
-        property_info = None
-        tenant_profile = None
-    
-    # Get tenant's maintenance requests
+    from tenancy.models import Tenancy, TenancyApplication
     from maintenance.models import MaintenanceRequest
-    maintenance_requests = MaintenanceRequest.objects.filter(
-        tenant=request.user
-    ).order_by('-created_at')
+    
+    # Current tenancy
+    current_tenancy = Tenancy.objects.filter(
+        tenant=user,
+        status='active'
+    ).select_related('rental_property').first()
+    
+    # Pending applications
+    pending_applications = TenancyApplication.objects.filter(
+        tenant=user,
+        status='pending'
+    ).select_related('rental_property').order_by('-created_at')
+    
+    # Maintenance requests
+    maintenance_requests = []
+    if current_tenancy:
+        maintenance_requests = MaintenanceRequest.objects.filter(
+            tenant=user,
+            property=current_tenancy.rental_property
+        ).order_by('-created_at')[:5]
+    
+    # Past tenancies
+    past_tenancies = Tenancy.objects.filter(
+        tenant=user,
+        status='terminated'
+    ).select_related('rental_property').order_by('-end_date')[:3]
     
     context = {
-        'tenant_profile': tenant_profile,
-        'property': property_info,
+        'current_tenancy': current_tenancy,
+        'pending_applications': pending_applications,
         'maintenance_requests': maintenance_requests,
+        'past_tenancies': past_tenancies,
     }
     return render(request, 'accounts/tenant_dashboard.html', context)
 
 
+# =============================================
+# My Account / Profile
+# =============================================
+
 @login_required
 def my_account(request):
     """User account page for profile management."""
-    from .forms import ProfilePictureForm
+    user = request.user
     
     if request.method == 'POST':
-        form = ProfilePictureForm(request.POST, request.FILES, instance=request.user)
-        if form.is_valid():
-            form.save()
-            messages.success(request, 'Profile picture updated successfully!')
-            return redirect('my_account')
+        if 'update_picture' in request.POST:
+            picture_form = ProfilePictureForm(request.POST, request.FILES, instance=user)
+            if picture_form.is_valid():
+                picture_form.save()
+                messages.success(request, 'Profile picture updated successfully!')
+                return redirect('my_account')
+            contact_form = ContactSettingsForm(instance=user)
+        elif 'update_contact' in request.POST:
+            contact_form = ContactSettingsForm(request.POST, instance=user)
+            if contact_form.is_valid():
+                contact_form.save()
+                messages.success(request, 'Contact settings updated successfully!')
+                return redirect('my_account')
+            picture_form = ProfilePictureForm(instance=user)
+        else:
+            picture_form = ProfilePictureForm(instance=user)
+            contact_form = ContactSettingsForm(instance=user)
     else:
-        form = ProfilePictureForm(instance=request.user)
+        picture_form = ProfilePictureForm(instance=user)
+        contact_form = ContactSettingsForm(instance=user)
     
-    context = {
-        'form': form,
-    }
-    return render(request, 'accounts/my_account.html', context)
-
+    return render(request, 'accounts/my_account.html', {
+        'form': picture_form,
+        'contact_form': contact_form,
+    })

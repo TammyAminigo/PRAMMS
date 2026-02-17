@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Terminate Tenancy - Propz{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="container">
+        <div style="max-width: 640px; margin: 0 auto;">
+            <div style="margin-bottom: 1.5rem;">
+                <a href="{% url 'tenancy_detail' pk=tenancy.pk %}" style="color: var(--accent); font-weight: 500;">←
+                    Back to Tenancy</a>
+            </div>
+
+            <div class="card" style="border: 2px solid var(--danger);">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <div
+                        style="width: 64px; height: 64px; border-radius: 50%; background: rgba(255, 82, 82, 0.1); display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; font-size: 2rem;">
+                        <i data-lucide="alert-triangle" class="icon-md"></i>
+                    </div>
+                    <h2 style="color: var(--danger);">Request Termination</h2>
+                    <p style="color: var(--gray-500); margin-top: 0.5rem;">
+                        You are about to request termination of this tenancy.
+                        {% if tenancy.landlord_terminated or tenancy.tenant_terminated %}
+                        The other party has already requested termination. Your confirmation will finalize it.
+                        {% else %}
+                        The other party will need to confirm before the tenancy is fully terminated.
+                        {% endif %}
+                    </p>
+                </div>
+
+                <!-- Summary -->
+                <div
+                    style="background: var(--gray-100); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 2rem;">
+                    <h4>{{ tenancy.rental_property.name }}</h4>
+                    <p style="color: var(--gray-500); font-size: 0.875rem;">
+                        {% if is_landlord %}
+                        Tenant: {{ tenancy.tenant.get_full_name }}
+                        {% else %}
+                        Landlord: {{ tenancy.landlord.get_full_name }}
+                        {% endif %}
+                    </p>
+                    <p style="color: var(--gray-500); font-size: 0.875rem;">
+                        Lease: {{ tenancy.start_date|date:"M d, Y" }} → {{ tenancy.lease_end_date|date:"M d,
+                        Y"|default:"N/A" }}
+                    </p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label">{{ form.reason.label }}</label>
+                        {{ form.reason }}
+                    </div>
+                    <div class="form-group" style="display: flex; align-items: center; gap: 0.75rem;">
+                        {{ form.confirm }}
+                        <label for="id_confirm" style="color: var(--gray-700); font-weight: 500; cursor: pointer;">
+                            I confirm I want to terminate this tenancy
+                        </label>
+                    </div>
+                    {% if form.confirm.errors %}
+                    <p class="form-error" style="margin-bottom: 1rem;">{{ form.confirm.errors.0 }}</p>
+                    {% endif %}
+                    <button type="submit" class="btn btn-danger btn-lg" style="width: 100%;">
+                        Confirm Termination Request
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

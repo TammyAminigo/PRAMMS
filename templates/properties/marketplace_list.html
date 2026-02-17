@@ -1,0 +1,422 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Marketplace - Propz{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero" style="padding: 3rem 0; min-height: auto;">
+    <div class="container">
+        <h1 style="font-size: 2.5rem;">
+            <i data-lucide="home" class="icon-lg" style="vertical-align: middle;"></i>
+            Property Marketplace
+        </h1>
+        <p>Discover your next home. Browse available properties listed by verified landlords.</p>
+    </div>
+</section>
+
+<!-- Search & Filters -->
+<section class="dashboard" style="padding-bottom: 0;">
+    <div class="container">
+        <form method="GET" action="{% url 'marketplace_list' %}" id="marketplaceForm">
+            <!-- Category Tabs -->
+            <div class="search-tabs">
+                <button type="button"
+                    class="search-tab {% if not listing_type or listing_type == 'sale' %}active{% endif %}"
+                    data-listing="sale">
+                    <i data-lucide="landmark" class="icon-sm"></i> Buy
+                </button>
+                <button type="button" class="search-tab {% if listing_type == 'rent' %}active{% endif %}"
+                    data-listing="rent">
+                    <i data-lucide="key" class="icon-sm"></i> Rent
+                </button>
+                <button type="button" class="search-tab {% if listing_type == 'shortlet' %}active{% endif %}"
+                    data-listing="shortlet">
+                    <i data-lucide="calendar" class="icon-sm"></i> Short Let
+                </button>
+                <button type="button" class="search-tab {% if listing_type == 'land' %}active{% endif %}"
+                    data-listing="land">
+                    <i data-lucide="mountain" class="icon-sm"></i> Land
+                </button>
+            </div>
+
+            <!-- Hidden listing type -->
+            <input type="hidden" name="listing_type" id="listingTypeInput" value="{{ listing_type|default:'sale' }}">
+
+            <!-- Search Bar -->
+            <div class="search-bar-row">
+                <div class="search-input-wrap">
+                    <i data-lucide="search" class="search-icon"></i>
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search properties..."
+                        class="search-main-input" id="searchInput">
+                </div>
+                <button type="submit" class="btn btn-primary search-submit-btn">
+                    <i data-lucide="search" class="icon-sm"></i> Search
+                </button>
+            </div>
+
+            <!-- Property Filters (Buy / Rent / Shortlet) -->
+            <div class="filter-bar" id="propertyFilters">
+                <div class="filter-item">
+                    <label class="filter-label">Type</label>
+                    <select name="property_type" class="filter-select">
+                        <option value="">All Types</option>
+                        {% for value, label in property_type_choices %}
+                        {% if value != 'land' %}
+                        <option value="{{ value }}" {% if property_type == value %}selected{% endif %}>{{ label }}
+                        </option>
+                        {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="filter-divider"></div>
+                <div class="filter-item">
+                    <label class="filter-label">Bedrooms</label>
+                    <select name="bedrooms" class="filter-select">
+                        <option value="">Any</option>
+                        <option value="1" {% if bedrooms == "1" %}selected{% endif %}>1 Bedroom</option>
+                        <option value="2" {% if bedrooms == "2" %}selected{% endif %}>2 Bedrooms</option>
+                        <option value="3" {% if bedrooms == "3" %}selected{% endif %}>3 Bedrooms</option>
+                        <option value="4" {% if bedrooms == "4" %}selected{% endif %}>4 Bedrooms</option>
+                        <option value="5" {% if bedrooms == "5" %}selected{% endif %}>5 Bedrooms</option>
+                        <option value="6" {% if bedrooms == "6" %}selected{% endif %}>6 Bedrooms</option>
+                        <option value="7" {% if bedrooms == "7" %}selected{% endif %}>7 Bedrooms</option>
+                        <option value="8" {% if bedrooms == "8" %}selected{% endif %}>8 Bedrooms</option>
+                        <option value="9" {% if bedrooms == "9" %}selected{% endif %}>9 Bedrooms</option>
+                        <option value="10" {% if bedrooms == "10" %}selected{% endif %}>10 Bedrooms</option>
+                    </select>
+                </div>
+                <div class="filter-divider"></div>
+                <div class="filter-item">
+                    <label class="filter-label">Min. Price</label>
+                    <input type="number" name="min_price" value="{{ min_price }}" placeholder="₦ Min"
+                        class="filter-input" min="0">
+                </div>
+                <div class="filter-divider"></div>
+                <div class="filter-item">
+                    <label class="filter-label">Max. Price</label>
+                    <input type="number" name="max_price" value="{{ max_price }}" placeholder="₦ Max"
+                        class="filter-input" min="0">
+                </div>
+                {% if query or bedrooms or min_price or max_price %}
+                <a href="{% url 'marketplace_list' %}?listing_type={{ listing_type|default:'sale' }}"
+                    class="filter-clear-btn">
+                    <i data-lucide="x" class="icon-xs"></i> Clear
+                </a>
+                {% endif %}
+            </div>
+
+            <!-- Land Filters -->
+            <div class="filter-bar land-filter-bar" id="landFilters" style="display: none;">
+                <div class="land-converter-panel">
+                    <h4 style="margin: 0 0 1rem; font-size: 0.95rem; color: var(--gray-600);">
+                        <i data-lucide="ruler" class="icon-sm" style="vertical-align: middle;"></i> Land Size Converter
+                    </h4>
+                    <div class="land-converter-row">
+                        <div class="filter-item">
+                            <label class="filter-label">From Unit</label>
+                            <select class="filter-select" id="landFromUnit">
+                                <option value="sqft">Square Feet (sq ft)</option>
+                                <option value="sqm">Square Metres (m²)</option>
+                                <option value="acres">Acres</option>
+                                <option value="hectares">Hectares</option>
+                                <option value="plots">Plots (60×120 ft)</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label class="filter-label">Value</label>
+                            <input type="text" class="filter-input" id="landFromValue"
+                                placeholder="e.g. 7200 or 60x120">
+                        </div>
+                        <div class="filter-item" style="align-self: flex-end;">
+                            <button type="button" class="btn btn-outline btn-sm" id="landConvertBtn"
+                                style="white-space: nowrap;">
+                                <i data-lucide="arrow-right-left" class="icon-xs"></i> Convert
+                            </button>
+                        </div>
+                        <div class="filter-item">
+                            <label class="filter-label">To Unit</label>
+                            <select class="filter-select" id="landToUnit">
+                                <option value="sqm">Square Metres (m²)</option>
+                                <option value="sqft">Square Feet (sq ft)</option>
+                                <option value="acres">Acres</option>
+                                <option value="hectares">Hectares</option>
+                                <option value="plots">Plots (60×120 ft)</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label class="filter-label">Result</label>
+                            <div class="land-result" id="landResult">—</div>
+                        </div>
+                    </div>
+                    <p class="land-converter-note" id="landMessage" style="display: none;"></p>
+                </div>
+                {% if query %}
+                <a href="{% url 'marketplace_list' %}?listing_type=land" class="filter-clear-btn">
+                    <i data-lucide="x" class="icon-xs"></i> Clear
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</section>
+
+<!-- Breadcrumbs -->
+<section style="padding: 0;">
+    <div class="container">
+        <nav class="breadcrumbs" style="margin-top: 1rem;">
+            <a href="{% url 'marketplace_list' %}" class="breadcrumb-link">Home</a>
+            {% if listing_type_display %}
+            <span class="breadcrumb-sep">/</span>
+            <a href="{% url 'marketplace_list' %}?listing_type={{ listing_type }}" class="breadcrumb-link">{{ listing_type_display }}</a>
+            {% endif %}
+            {% if property_type_display %}
+            <span class="breadcrumb-sep">/</span>
+            <a href="{% url 'marketplace_list' %}?listing_type={{ listing_type }}&property_type={{ property_type }}"
+                class="breadcrumb-link">{{ property_type_display }}</a>
+            {% endif %}
+            {% if query %}
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current">Search: "{{ query }}"</span>
+            {% endif %}
+        </nav>
+    </div>
+</section>
+
+<!-- Property Grid -->
+<section class="dashboard">
+    <div class="container">
+        {% if properties %}
+        <p class="results-count" style="color: var(--gray-500); margin-bottom: 1.5rem;">
+            {{ properties|length }} propert{{ properties|length|pluralize:"y,ies" }} found
+        </p>
+        <div class="property-grid">
+            {% for property in properties %}
+            <a href="{% url 'marketplace_detail' pk=property.pk %}" class="property-card"
+                style="text-decoration: none; color: inherit;">
+                <div class="property-card-image" {% if property.photo %}style="background: none;" {% endif %}>
+                    {% if property.photo %}
+                    <img src="{{ property.photo.url }}" alt="{{ property.name }}"
+                        style="width:100%;height:100%;object-fit:cover;border-radius:12px 12px 0 0;">
+                    {% else %}
+                    <i data-lucide="house" class="icon-2xl" style="color: rgba(255,255,255,0.7);"></i>
+                    {% endif %}
+                    <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 6px;">
+                        <span class="badge badge-success" style="background: var(--accent); color: white;">{{ property.get_listing_type_display }}</span>
+                        <span class="badge badge-info">{{ property.get_property_type_display }}</span>
+                    </div>
+                </div>
+                <div class="property-card-body">
+                    <h4>{{ property.name }}</h4>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs" style="vertical-align: middle;"></i> {{ property.address }}</p>
+                    {% if property.description %}
+                    <p
+                        style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ property.description|truncatewords:20 }}</p>
+                    {% endif %}
+                    <div class="rent">
+                        &#8358;{{ property.rent_amount|floatformat:"0"|intcomma }}
+                        {% if property.get_rent_period_display %}<span>/ {{ property.get_rent_period_display }}</span>{% endif %}
+                    </div>
+                    {% if property.bedrooms %}
+                    <div style="margin-top: 0.5rem; color: var(--gray-500); font-size: 0.85rem;">
+                        <i data-lucide="bed-double" class="icon-xs" style="vertical-align: middle;"></i> {{ property.bedrooms }} Bedroom{{ property.bedrooms|pluralize }}
+                    </div>
+                    {% endif %}
+                    <div
+                        style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: var(--gray-400); font-size: 0.8rem;">
+                        <i data-lucide="user" class="icon-xs"></i>
+                        <span>Listed by {{ property.landlord.get_full_name }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        {% if has_searched %}
+        <div class="no-listings-state">
+            <div class="no-listings-icon">
+                <i data-lucide="search-x" style="width: 64px; height: 64px; color: var(--gray-400); opacity: 0.6;"></i>
+            </div>
+            <h3 class="no-listings-heading">No Listings Found</h3>
+            <p class="no-listings-text">We couldn't find any available properties matching your specific criteria. Try
+                adjusting your search filters to discover more options.</p>
+            <a href="{% url 'marketplace_list' %}?listing_type={{ listing_type|default:'sale' }}"
+                class="btn btn-outline" style="margin-top: 1.5rem;">Clear Filters</a>
+        </div>
+        {% elif suggested_properties %}
+        <div style="text-align: center; margin-bottom: 2rem;">
+            <h3 style="color: var(--gray-600); margin-bottom: 0.5rem;">
+                <i data-lucide="sparkles" class="icon-sm" style="vertical-align: middle;"></i> Suggested Properties
+            </h3>
+            <p style="color: var(--gray-500); font-size: 0.95rem;">No {{ listing_type_display|lower }} listings yet.
+                Here are some properties you might like:</p>
+        </div>
+        <div class="property-grid">
+            {% for property in suggested_properties %}
+            <a href="{% url 'marketplace_detail' pk=property.pk %}" class="property-card"
+                style="text-decoration: none; color: inherit;">
+                <div class="property-card-image" {% if property.photo %}style="background: none;" {% endif %}>
+                    {% if property.photo %}
+                    <img src="{{ property.photo.url }}" alt="{{ property.name }}"
+                        style="width:100%;height:100%;object-fit:cover;border-radius:12px 12px 0 0;">
+                    {% else %}
+                    <i data-lucide="house" class="icon-2xl" style="color: rgba(255,255,255,0.7);"></i>
+                    {% endif %}
+                    <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 6px;">
+                        <span class="badge badge-success" style="background: var(--accent); color: white;">{{ property.get_listing_type_display }}</span>
+                        <span class="badge badge-info">{{ property.get_property_type_display }}</span>
+                    </div>
+                </div>
+                <div class="property-card-body">
+                    <h4>{{ property.name }}</h4>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs" style="vertical-align: middle;"></i> {{ property.address }}</p>
+                    {% if property.description %}
+                    <p
+                        style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                        {{ property.description|truncatewords:20 }}</p>
+                    {% endif %}
+                    <div class="rent">
+                        &#8358;{{ property.rent_amount|floatformat:"0"|intcomma }}
+                        {% if property.get_rent_period_display %}<span>/ {{ property.get_rent_period_display }}</span>{% endif %}
+                    </div>
+                    {% if property.bedrooms %}
+                    <div style="margin-top: 0.5rem; color: var(--gray-500); font-size: 0.85rem;">
+                        <i data-lucide="bed-double" class="icon-xs" style="vertical-align: middle;"></i> {{ property.bedrooms }} Bedroom{{ property.bedrooms|pluralize }}
+                    </div>
+                    {% endif %}
+                    <div
+                        style="margin-top: 0.75rem; display: flex; align-items: center; gap: 0.5rem; color: var(--gray-400); font-size: 0.8rem;">
+                        <i data-lucide="user" class="icon-xs"></i>
+                        <span>Listed by {{ property.landlord.get_full_name }}</span>
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="no-listings-state">
+            <div class="no-listings-icon">
+                <i data-lucide="home" style="width: 64px; height: 64px; color: var(--gray-400); opacity: 0.6;"></i>
+            </div>
+            <h3 class="no-listings-heading">No Properties Available Yet</h3>
+            <p class="no-listings-text">There are no properties listed at the moment. Check back soon!</p>
+        </div>
+        {% endif %}
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const tabs = document.querySelectorAll('.search-tab');
+        const listingInput = document.getElementById('listingTypeInput');
+        const propertyFilters = document.getElementById('propertyFilters');
+        const landFilters = document.getElementById('landFilters');
+        const form = document.getElementById('marketplaceForm');
+        const searchInput = document.getElementById('searchInput');
+
+        // Tab click handler
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function () {
+                tabs.forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                const listing = this.dataset.listing;
+                listingInput.value = listing;
+
+                if (listing === 'land') {
+                    propertyFilters.style.display = 'none';
+                    landFilters.style.display = 'block';
+                    searchInput.placeholder = 'Search land listings...';
+                } else {
+                    propertyFilters.style.display = 'flex';
+                    landFilters.style.display = 'none';
+                    const labels = { sale: 'properties for sale', rent: 'properties for rent', shortlet: 'short let properties' };
+                    searchInput.placeholder = 'Search ' + (labels[listing] || 'properties') + '...';
+                }
+
+                // Auto-submit when switching tabs - clear filter values first
+                form.querySelectorAll('.filter-select, .filter-input').forEach(el => {
+                    if (el.name) el.value = '';
+                });
+                form.submit();
+            });
+        });
+
+        // Init: show correct filters on page load
+        const currentListing = listingInput.value;
+        if (currentListing === 'land') {
+            propertyFilters.style.display = 'none';
+            landFilters.style.display = 'block';
+            searchInput.placeholder = 'Search land listings...';
+        } else {
+            propertyFilters.style.display = 'flex';
+            landFilters.style.display = 'none';
+            const labels = { sale: 'properties for sale', rent: 'properties for rent', shortlet: 'short let properties' };
+            searchInput.placeholder = 'Search ' + (labels[currentListing] || 'properties') + '...';
+        }
+
+        // Land Converter
+        const convertBtn = document.getElementById('landConvertBtn');
+        const landResult = document.getElementById('landResult');
+        const landMessage = document.getElementById('landMessage');
+
+        const toSqFt = {
+            sqft: 1,
+            sqm: 10.7639,
+            acres: 43560,
+            hectares: 107639.104,
+            plots: 7200
+        };
+
+        function parseLandValue(input, unit) {
+            input = input.trim();
+            const dimMatch = input.match(/^(\d+(?:\.\d+)?)\s*[xX]\s*(\d+(?:\.\d+)?)$/);
+            if (dimMatch) {
+                return parseFloat(dimMatch[1]) * parseFloat(dimMatch[2]);
+            }
+            const num = parseFloat(input);
+            if (isNaN(num) || num < 0) return null;
+            return num;
+        }
+
+        if (convertBtn) {
+            convertBtn.addEventListener('click', function () {
+                const fromUnit = document.getElementById('landFromUnit').value;
+                const toUnit = document.getElementById('landToUnit').value;
+                const rawValue = document.getElementById('landFromValue').value;
+
+                landMessage.style.display = 'none';
+                landResult.textContent = '\u2014';
+
+                const value = parseLandValue(rawValue, fromUnit);
+                if (value === null || value === 0) {
+                    landMessage.textContent = 'Please enter a valid number or dimensions (e.g. 7200 or 60x120).';
+                    landMessage.style.display = 'block';
+                    landMessage.style.color = 'var(--danger)';
+                    return;
+                }
+
+                const sqft = value * toSqFt[fromUnit];
+                const result = sqft / toSqFt[toUnit];
+
+                const unitLabels = {
+                    sqft: 'sq ft',
+                    sqm: 'm\u00B2',
+                    acres: 'acres',
+                    hectares: 'hectares',
+                    plots: 'plots'
+                };
+
+                landResult.textContent = result.toLocaleString('en-NG', { maximumFractionDigits: 2 }) + ' ' + unitLabels[toUnit];
+                landMessage.textContent = rawValue + ' ' + unitLabels[fromUnit] + ' = ' + landResult.textContent;
+                landMessage.style.display = 'block';
+                landMessage.style.color = 'var(--accent)';
+            });
+        }
+    });
+</script>
+{% endblock %}

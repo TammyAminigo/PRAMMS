@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}Choose Your Role - Propz{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="auth-card" style="max-width: 680px;">
+        <h2 style="text-align: center;">How do you want to use Propz?</h2>
+        <p class="subtitle" style="text-align: center;">Don't worry, you can always switch roles later.</p>
+
+        <form method="post" id="roleForm">
+            {% csrf_token %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+            <input type="hidden" name="role" id="roleInput" value="">
+
+            <div class="role-container">
+                <!-- Seeker Card -->
+                <div class="role-card" data-role="tenant" onclick="selectRole('tenant', this)">
+                    <div class="role-icon">
+                        <i data-lucide="search" style="width: 40px; height: 40px;"></i>
+                    </div>
+                    <h3>I'm looking for a property</h3>
+                    <p>Browse verified listings, secure your next home, and track your tenancy journey.</p>
+                    <div class="role-check">
+                        <i data-lucide="check-circle-2" style="width: 22px; height: 22px;"></i>
+                    </div>
+                </div>
+
+                <!-- Provider Card -->
+                <div class="role-card" data-role="landlord" onclick="selectRole('landlord', this)">
+                    <div class="role-icon">
+                        <i data-lucide="key-round" style="width: 40px; height: 40px;"></i>
+                    </div>
+                    <h3>I want to list or manage property</h3>
+                    <p>List your space, reach verified renters, and manage maintenance with total accountability.</p>
+                    <div class="role-check">
+                        <i data-lucide="check-circle-2" style="width: 22px; height: 22px;"></i>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-finish" id="finishBtn" disabled>
+                Finish Registration
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .role-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        padding: 20px 0;
+        margin-top: 1rem;
+    }
+
+    .role-card {
+        border: 2px solid #e0e0e0;
+        border-radius: 12px;
+        padding: 32px 24px 28px;
+        width: 280px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-align: center;
+        position: relative;
+        background: var(--white);
+    }
+
+    .role-card:hover {
+        border-color: #00c853;
+        transform: translateY(-5px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+    }
+
+    .role-card.selected {
+        border-color: #00c853;
+        background-color: rgba(0, 200, 83, 0.03);
+        box-shadow: 0 8px 20px rgba(0, 200, 83, 0.12);
+    }
+
+    .role-icon {
+        color: var(--primary-dark, #0a1628);
+        margin-bottom: 16px;
+        display: flex;
+        justify-content: center;
+    }
+
+    .role-card h3 {
+        font-size: 1.05rem;
+        font-weight: 600;
+        color: var(--primary-dark, #0a1628);
+        margin-bottom: 8px;
+    }
+
+    .role-card p {
+        font-size: 0.875rem;
+        color: var(--gray-500, #6b7280);
+        line-height: 1.5;
+        margin: 0;
+    }
+
+    .role-check {
+        position: absolute;
+        top: 12px;
+        right: 12px;
+        color: #00c853;
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.25s ease;
+    }
+
+    .role-card.selected .role-check {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    .role-card.selected .role-icon {
+        color: #00c853;
+    }
+
+    .btn-finish {
+        width: 100%;
+        margin-top: 1.5rem;
+        padding: 14px;
+        font-size: 1rem;
+        font-weight: 600;
+        transition: all 0.3s ease;
+    }
+
+    .btn-finish:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background: var(--gray-400, #9ca3af);
+        border-color: var(--gray-400, #9ca3af);
+    }
+
+    @media (max-width: 640px) {
+        .role-container {
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .role-card {
+            width: 100%;
+            max-width: 320px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectRole(role, card) {
+        // Remove selected from all cards
+        document.querySelectorAll('.role-card').forEach(c => c.classList.remove('selected'));
+        // Select this card
+        card.classList.add('selected');
+        // Update hidden input
+        document.getElementById('roleInput').value = role;
+        // Enable submit button
+        document.getElementById('finishBtn').disabled = false;
+
+        // Re-render lucide icons for the check marks
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+</script>
+{% endblock %}

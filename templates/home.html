@@ -1,108 +1,294 @@
 {% extends 'base.html' %}
 
-{% block title %}PRAMMS - Property Rental and Maintenance Management System{% endblock %}
+{% block title %}Propz - Find Your Next Property{% endblock %}
 
 {% block content %}
 <!-- Hero Section -->
 <section class="hero">
     <div class="container">
-        <p
-            style="font-size: 1rem; color: var(--accent); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 1rem;">
-            Property Rental and Maintenance Management System</p>
-        <h1>Simplify Your Property Management</h1>
-        <p>The all-in-one platform for landlords and tenants to manage properties, handle maintenance requests, and
-            communicate effortlessly.</p>
-        <div class="hero-actions">
-            <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Register as Landlord</a>
-            <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">Login to Your Account</a>
+        <h1>Find Your Perfect<br>Property Today</h1>
+        <p>The all-in-one marketplace to list, find, and manage properties with total accountability.</p>
+
+        <!-- Tabbed Search -->
+        <div class="hero-search" style="max-width: 800px; margin: 2rem auto 0;">
+            <form method="GET" action="{% url 'marketplace_list' %}" id="heroSearchForm">
+                <div class="search-tabs">
+                    <button type="button" class="search-tab active" data-listing="sale" onclick="setHomeTab(this)">
+                        <i data-lucide="landmark" class="icon-sm"></i> Buy
+                    </button>
+                    <button type="button" class="search-tab" data-listing="rent" onclick="setHomeTab(this)">
+                        <i data-lucide="key" class="icon-sm"></i> Rent
+                    </button>
+                    <button type="button" class="search-tab" data-listing="shortlet" onclick="setHomeTab(this)">
+                        <i data-lucide="calendar" class="icon-sm"></i> Shortlet
+                    </button>
+                    <button type="button" class="search-tab" data-listing="land" onclick="setHomeTab(this)">
+                        <i data-lucide="mountain" class="icon-sm"></i> Land
+                    </button>
+                </div>
+
+                <input type="hidden" name="listing_type" id="heroListingType" value="sale">
+
+                <!-- Search Bar -->
+                <div class="search-bar-row">
+                    <div class="search-input-wrap">
+                        <i data-lucide="search" class="search-icon"></i>
+                        <input type="text" name="q" placeholder="Search properties for sale..."
+                            class="search-main-input" id="heroSearchInput">
+                    </div>
+                    <button type="submit" class="btn btn-primary search-submit-btn">
+                        <i data-lucide="search" class="icon-sm"></i> Search
+                    </button>
+                </div>
+
+                <!-- Property Filters -->
+                <div class="filter-bar" id="homePropertyFilters">
+                    <div class="filter-item">
+                        <label class="filter-label">Type</label>
+                        <select name="property_type" class="filter-select">
+                            <option value="">All Types</option>
+                            <option value="house">House</option>
+                            <option value="apartment">Apartment</option>
+                            <option value="flat">Flat</option>
+                            <option value="shop">Shop/Commercial</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    <div class="filter-divider"></div>
+                    <div class="filter-item">
+                        <label class="filter-label">Bedrooms</label>
+                        <select name="bedrooms" class="filter-select">
+                            <option value="">Any</option>
+                            <option value="1">1 Bedroom</option>
+                            <option value="2">2 Bedrooms</option>
+                            <option value="3">3 Bedrooms</option>
+                            <option value="4">4 Bedrooms</option>
+                            <option value="5">5 Bedrooms</option>
+                            <option value="6">6 Bedrooms</option>
+                            <option value="7">7 Bedrooms</option>
+                            <option value="8">8 Bedrooms</option>
+                            <option value="9">9 Bedrooms</option>
+                            <option value="10">10 Bedrooms</option>
+                        </select>
+                    </div>
+                    <div class="filter-divider"></div>
+                    <div class="filter-item">
+                        <label class="filter-label">Min. Price</label>
+                        <input type="number" name="min_price" placeholder="₦ Min" class="filter-input" min="0">
+                    </div>
+                    <div class="filter-divider"></div>
+                    <div class="filter-item">
+                        <label class="filter-label">Max. Price</label>
+                        <input type="number" name="max_price" placeholder="₦ Max" class="filter-input" min="0">
+                    </div>
+                </div>
+
+                <!-- Land Filters -->
+                <div class="filter-bar land-filter-bar" id="homeLandFilters" style="display: none;">
+                    <div class="land-converter-panel">
+                        <h4 style="margin: 0 0 1rem; font-size: 0.95rem; color: var(--gray-600);"><i data-lucide="ruler"
+                                class="icon-sm" style="vertical-align: middle;"></i> Land Size Converter</h4>
+                        <div class="land-converter-row">
+                            <div class="filter-item">
+                                <label class="filter-label">From Unit</label>
+                                <select class="filter-select" id="homeFromUnit">
+                                    <option value="sqft">Square Feet (sq ft)</option>
+                                    <option value="sqm">Square Metres (m²)</option>
+                                    <option value="acres">Acres</option>
+                                    <option value="hectares">Hectares</option>
+                                    <option value="plots">Plots (60×120 ft)</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label">Value</label>
+                                <input type="text" class="filter-input" id="homeFromValue"
+                                    placeholder="e.g. 7200 or 60x120">
+                            </div>
+                            <div class="filter-item" style="align-self: flex-end;">
+                                <button type="button" class="btn btn-outline btn-sm" id="homeConvertBtn"
+                                    style="white-space: nowrap;">
+                                    <i data-lucide="arrow-right-left" class="icon-xs"></i> Convert
+                                </button>
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label">To Unit</label>
+                                <select class="filter-select" id="homeToUnit">
+                                    <option value="sqm">Square Metres (m²)</option>
+                                    <option value="sqft">Square Feet (sq ft)</option>
+                                    <option value="acres">Acres</option>
+                                    <option value="hectares">Hectares</option>
+                                    <option value="plots">Plots (60×120 ft)</option>
+                                </select>
+                            </div>
+                            <div class="filter-item">
+                                <label class="filter-label">Result</label>
+                                <div class="land-result" id="homeResult">—</div>
+                            </div>
+                        </div>
+                        <p class="land-converter-note" id="homeMessage" style="display: none;"></p>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </section>
 
 <!-- Features Section -->
-<section class="dashboard" style="padding: 4rem 0;">
+<section class="features" style="padding: 5rem 0;">
     <div class="container">
-        <h2 class="section-title text-center" style="margin-bottom: 3rem;">Why Choose PRAMMS?</h2>
+        <div style="text-align: center; margin-bottom: 3rem;">
+            <h2>How Propz Works</h2>
+            <p style="color: var(--gray-500); max-width: 600px; margin: 0.75rem auto 0;">A transparent property
+                management ecosystem connecting landlords and tenants.</p>
+        </div>
 
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon primary">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="1.5">
-                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                        <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
+        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+            <!-- Feature 1 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                    <i data-lucide="home" class="icon-2xl icon-accent"></i>
                 </div>
-                <div class="stat-content">
-                    <h4>Property Management</h4>
-                    <p>Add and manage multiple properties with detailed information and tenant tracking.</p>
-                </div>
+                <h3 style="margin-bottom: 0.75rem;">Open Marketplace</h3>
+                <p style="color: var(--gray-500);">Browse available properties publicly. No account needed to discover
+                    your next home.</p>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon success">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="1.5">
-                        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-                        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-                    </svg>
+            <!-- Feature 2 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                    <i data-lucide="handshake" class="icon-2xl icon-accent"></i>
                 </div>
-                <div class="stat-content">
-                    <h4>Secure Invitations</h4>
-                    <p>Invite tenants via unique, single-use links bound to specific properties.</p>
-                </div>
+                <h3 style="margin-bottom: 0.75rem;">Transparent Connections</h3>
+                <p style="color: var(--gray-500);">Apply for properties directly. Landlords review applications and
+                    confirm tenancies.</p>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon warning">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="1.5">
-                        <path
-                            d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z">
-                        </path>
-                    </svg>
+            <!-- Feature 3 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                    <i data-lucide="refresh-cw" class="icon-2xl icon-accent"></i>
                 </div>
-                <div class="stat-content">
-                    <h4>Maintenance Tracking</h4>
-                    <p>Submit, track, and resolve maintenance requests with photo uploads.</p>
-                </div>
+                <h3 style="margin-bottom: 0.75rem;">Lifecycle Management</h3>
+                <p style="color: var(--gray-500);">Full tenancy lifecycle, from application to lease to mutual
+                    termination. Everything tracked.</p>
             </div>
 
-            <div class="stat-card">
-                <div class="stat-icon danger">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                        stroke-width="1.5">
-                        <line x1="18" y1="20" x2="18" y2="10"></line>
-                        <line x1="12" y1="20" x2="12" y2="4"></line>
-                        <line x1="6" y1="20" x2="6" y2="14"></line>
-                    </svg>
+            <!-- Feature 4 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                    <i data-lucide="wrench" class="icon-2xl icon-accent"></i>
                 </div>
-                <div class="stat-content">
-                    <h4>Dashboard Analytics</h4>
-                    <p>Get insights into your properties, vacancies, and pending requests.</p>
+                <h3 style="margin-bottom: 0.75rem;">Maintenance Requests</h3>
+                <p style="color: var(--gray-500);">Submit, track, and resolve maintenance issues seamlessly during your
+                    tenancy.</p>
+            </div>
+
+            <!-- Feature 5 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                    <i data-lucide="bar-chart-3" class="icon-2xl icon-accent"></i>
                 </div>
+                <h3 style="margin-bottom: 0.75rem;">Property Analytics</h3>
+                <p style="color: var(--gray-500);">Landlords get clear insights: vacancy tracking, rent monitoring, and
+                    tenancy history.</p>
+            </div>
+
+            <!-- Feature 6 -->
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                    <i data-lucide="landmark" class="icon-2xl icon-accent"></i>
+                </div>
+                <h3 style="margin-bottom: 0.75rem;">Access to Mortgage Plans</h3>
+                <p style="color: var(--gray-500);">Explore mortgage options and financing plans to help you own your
+                    dream property.</p>
             </div>
         </div>
     </div>
 </section>
 
-<!-- CTA Section with integrated footer -->
+<!-- CTA Section -->
 <section
-    style="background: linear-gradient(135deg, var(--primary-dark), var(--primary)); padding: 4rem 0 2rem 0; text-align: center; color: white;">
+    style="background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); padding: 4rem 0; text-align: center;">
     <div class="container">
         <h2 style="color: white; margin-bottom: 1rem;">Ready to Get Started?</h2>
         <p
             style="color: var(--gray-300); margin-bottom: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
-            Join hundreds of landlords who trust PRAMMS to manage their rental properties efficiently.
+            Whether you're a landlord looking to list properties or a tenant searching for a home, Propz has you
+            covered.
         </p>
-        <a href="{% url 'register' %}" class="btn btn-primary btn-lg">Create Your Account</a>
-    </div>
-    <!-- Footer content integrated into CTA -->
-    <div class="container" style="margin-top: 4rem; padding-top: 2rem; border-top: 1px solid rgba(255,255,255,0.1);">
-        <p style="color: var(--gray-400); font-size: 0.875rem;">&copy; 2026 PRAMMS - Property Rental and Maintenance
-            Management System</p>
+        <div class="hero-actions">
+            <a href="{% url 'marketplace_list' %}" class="btn btn-primary btn-lg">Browse Properties</a>
+            <a href="{% url 'login' %}" class="btn btn-secondary btn-lg">Sign In</a>
+        </div>
     </div>
 </section>
 {% endblock %}
 
-{% block footer %}{% endblock %}
+{% block extra_js %}
+<script>
+    function setHomeTab(btn) {
+        document.querySelectorAll('.search-tab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+
+        const listing = btn.dataset.listing;
+        document.getElementById('heroListingType').value = listing;
+
+        const searchInput = document.getElementById('heroSearchInput');
+        const propertyFilters = document.getElementById('homePropertyFilters');
+        const landFilters = document.getElementById('homeLandFilters');
+
+        // Clear all filter values when switching tabs (match marketplace behavior)
+        document.querySelectorAll('#homePropertyFilters .filter-select, #homePropertyFilters .filter-input').forEach(el => {
+            el.value = '';
+        });
+
+        if (listing === 'land') {
+            propertyFilters.style.display = 'none';
+            landFilters.style.display = 'block';
+            searchInput.placeholder = 'Search land listings...';
+        } else {
+            propertyFilters.style.display = 'flex';
+            landFilters.style.display = 'none';
+            const labels = { sale: 'properties for sale', rent: 'properties for rent', shortlet: 'short let properties' };
+            searchInput.placeholder = 'Search ' + (labels[listing] || 'properties') + '...';
+        }
+    }
+
+    // Land converter for home page
+    document.addEventListener('DOMContentLoaded', function () {
+        const convertBtn = document.getElementById('homeConvertBtn');
+        const toSqFt = { sqft: 1, sqm: 10.7639, acres: 43560, hectares: 107639.104, plots: 7200 };
+        const unitLabels = { sqft: 'sq ft', sqm: 'm²', acres: 'acres', hectares: 'hectares', plots: 'plots' };
+
+        if (convertBtn) {
+            convertBtn.addEventListener('click', function () {
+                const fromUnit = document.getElementById('homeFromUnit').value;
+                const toUnit = document.getElementById('homeToUnit').value;
+                const rawValue = document.getElementById('homeFromValue').value.trim();
+                const resultEl = document.getElementById('homeResult');
+                const messageEl = document.getElementById('homeMessage');
+
+                messageEl.style.display = 'none';
+                resultEl.textContent = '—';
+
+                const dimMatch = rawValue.match(/^(\d+(?:\.\d+)?)\s*[xX×]\s*(\d+(?:\.\d+)?)$/);
+                let value = dimMatch ? parseFloat(dimMatch[1]) * parseFloat(dimMatch[2]) : parseFloat(rawValue);
+
+                if (isNaN(value) || value <= 0) {
+                    messageEl.textContent = 'Please enter a valid number or dimensions (e.g. 7200 or 60x120).';
+                    messageEl.style.display = 'block';
+                    messageEl.style.color = 'var(--danger)';
+                    return;
+                }
+
+                const sqft = value * toSqFt[fromUnit];
+                const result = sqft / toSqFt[toUnit];
+                resultEl.textContent = result.toLocaleString('en-NG', { maximumFractionDigits: 2 }) + ' ' + unitLabels[toUnit];
+                messageEl.textContent = rawValue + ' ' + unitLabels[fromUnit] + ' = ' + resultEl.textContent;
+                messageEl.style.display = 'block';
+                messageEl.style.color = 'var(--accent)';
+            });
+        }
+    });
+</script>
+{% endblock %}

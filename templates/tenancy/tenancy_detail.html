@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Tenancy Details - Propz{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="container">
+        <div style="margin-bottom: 1.5rem;">
+            <a href="{% url 'dashboard' %}" style="color: var(--accent); font-weight: 500;">← Back to Dashboard</a>
+        </div>
+
+        <div class="dashboard-header">
+            <div>
+                <h1>Tenancy Details</h1>
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.5rem;">
+                    {% if tenancy.status == 'active' %}
+                    <span class="badge badge-success">Active</span>
+                    {% elif tenancy.status == 'pending_termination' %}
+                    <span class="badge badge-warning">Pending Termination</span>
+                    {% elif tenancy.status == 'terminated' %}
+                    <span class="badge badge-danger">Terminated</span>
+                    {% endif %}
+                </div>
+            </div>
+            {% if tenancy.status in 'active,pending_termination' %}
+            {% if is_landlord and not tenancy.landlord_terminated or is_tenant and not tenancy.tenant_terminated %}
+            <a href="{% url 'terminate_tenancy' pk=tenancy.pk %}" class="btn btn-danger">
+                Request Termination
+            </a>
+            {% endif %}
+            {% endif %}
+        </div>
+
+        <div class="property-detail-grid">
+            <div class="property-detail-main">
+                <!-- Property Info -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">Property</h3>
+                    <h4>{{ tenancy.rental_property.name }}</h4>
+                    <p style="color: var(--gray-500); margin-bottom: 0.75rem;"><i data-lucide="map-pin"
+                            class="icon-xs"></i> {{ tenancy.rental_property.address }}
+                    </p>
+                    <p style="color: var(--primary); font-weight: 700; font-size: 1.5rem;">
+                        ₦{{ tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }}
+                        <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-500);">/ {{ tenancy.rental_property.get_rent_period_display  }}</span>
+                    </p>
+                </div>
+
+                <!-- Lease Details -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">Lease Information</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Start Date</span>
+                            <span class="detail-value">{{ tenancy.start_date|date:"M d, Y" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Lease End Date</span>
+                            <span class="detail-value">{{ tenancy.lease_end_date|date:"M d, Y"|default:"N/A" }}</span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Days Remaining</span>
+                            <span class="detail-value"
+                                style="{% if tenancy.days_remaining and tenancy.days_remaining < 30 %}color: var(--danger){% elif tenancy.days_remaining and tenancy.days_remaining < 90 %}color: var(--warning){% else %}color: var(--accent){% endif %}">
+                                {{ tenancy.days_remaining|default:"N/A" }} days
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Status</span>
+                            <span class="detail-value">{{ tenancy.get_status_display }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Termination Status (if applicable) -->
+                {% if tenancy.status == 'pending_termination' %}
+                <div class="card" style="border: 2px solid var(--warning); margin-bottom: 1.5rem;">
+                    <h3 style="color: var(--warning); margin-bottom: 1rem;"><i data-lucide="alert-triangle"
+                            class="icon-md"></i> Pending Termination</h3>
+                    <div class="detail-grid">
+                        <div class="detail-item">
+                            <span class="detail-label">Landlord</span>
+                            <span class="detail-value">
+                                {% if tenancy.landlord_terminated %}
+                                <span style="color: var(--danger);"><i data-lucide="check" class="icon-xs"
+                                        style="vertical-align: middle;"></i> Requested Termination</span>
+                                {% else %}
+                                <span style="color: var(--gray-400);">Awaiting</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                        <div class="detail-item">
+                            <span class="detail-label">Tenant</span>
+                            <span class="detail-value">
+                                {% if tenancy.tenant_terminated %}
+                                <span style="color: var(--danger);"><i data-lucide="check" class="icon-xs"
+                                        style="vertical-align: middle;"></i> Requested Termination</span>
+                                {% else %}
+                                <span style="color: var(--gray-400);">Awaiting</span>
+                                {% endif %}
+                            </span>
+                        </div>
+                    </div>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-top: 1rem;">
+                        Both parties must confirm termination for the tenancy to end. The property will return to the
+                        marketplace once terminated.
+                    </p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Sidebar -->
+            <div class="property-detail-sidebar">
+                <!-- Other Party Info -->
+                <div class="card" style="margin-bottom: 1.5rem;">
+                    <h3 style="margin-bottom: 1rem;">
+                        {% if is_landlord %}Tenant{% else %}Landlord{% endif %}
+                    </h3>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div
+                            style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.2rem;">
+                            {% if is_landlord %}
+                            {{ tenancy.tenant.first_name.0 }}{{ tenancy.tenant.last_name.0 }}
+                            {% else %}
+                            {{ tenancy.landlord.first_name.0 }}{{ tenancy.landlord.last_name.0 }}
+                            {% endif %}
+                        </div>
+                        <div>
+                            <p style="font-weight: 600;">
+                                {% if is_landlord %}{{ tenancy.tenant.get_full_name }}{% else %}{{ tenancy.landlord.get_full_name  }}{% endif %}
+                            </p>
+                            <p style="color: var(--gray-500); font-size: 0.875rem;">
+                                {% if is_landlord %}{{ tenancy.tenant.email }}{% else %}{{ tenancy.landlord.email }}{% endif %}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="card">
+                    <h3 style="margin-bottom: 1rem;">Actions</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                        {% if is_landlord %}
+                        <a href="{% url 'property_detail' pk=tenancy.rental_property.pk %}" class="btn btn-outline"
+                            style="width: 100%;">View Property</a>
+                        {% endif %}
+                        <a href="{% url 'active_tenancies' %}" class="btn btn-outline" style="width: 100%;">All
+                            Tenancies</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

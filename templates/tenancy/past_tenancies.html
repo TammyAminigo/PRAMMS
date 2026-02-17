@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Tenancy History - Propz{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Tenancy History</h1>
+            <div class="actions">
+                <a href="{% url 'active_tenancies' %}" class="btn btn-outline">Active Tenancies</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline">← Dashboard</a>
+            </div>
+        </div>
+
+        {% if tenancies %}
+        <div class="property-grid">
+            {% for tenancy in tenancies %}
+            <div class="property-card" style="opacity: 0.8;">
+                <div class="property-card-image" style="height: 80px; background: var(--gray-300);">
+                    <span class="placeholder-icon"><i data-lucide="archive" class="icon-md"
+                            style="color: var(--gray-500);"></i></span>
+                    <div style="position: absolute; top: 12px; right: 12px;">
+                        <span class="badge badge-danger">{{ tenancy.get_status_display }}</span>
+                    </div>
+                </div>
+                <div class="property-card-body">
+                    <h4>{{ tenancy.rental_property.name }}</h4>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address }}</p>
+
+                    <p style="color: var(--gray-500); font-size: 0.875rem;">
+                        {{ tenancy.start_date|date:"M d, Y" }} → {{ tenancy.terminated_at|date:"M d, Y"|default:"N/A" }}
+                    </p>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.25rem;">
+                        {% if user.is_landlord %}
+                        Tenant: {{ tenancy.tenant.get_full_name }}
+                        {% else %}
+                        Landlord: {{ tenancy.landlord.get_full_name }}
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><i data-lucide="archive" class="icon-md"></i></div>
+            <h3>No Past Tenancies</h3>
+            <p>Terminated tenancies will appear here as an archive.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

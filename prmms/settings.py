@@ -50,10 +50,13 @@ INSTALLED_APPS = [
     # Cloud storage
     'cloudinary_storage',
     'cloudinary',
+    # Django utilities
+    'django.contrib.humanize',
     # Custom apps
     'accounts',
     'properties',
     'maintenance',
+    'tenancy',
 ]
 
 MIDDLEWARE = [

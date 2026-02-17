@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
 from .models import User
-from prmms.admin_site import pramms_admin_site
+from prmms.admin_site import propz_admin_site
 
 
 class UserAdmin(BaseUserAdmin):
@@ -22,5 +22,5 @@ class UserAdmin(BaseUserAdmin):
 
 
 # Register with custom admin site
-pramms_admin_site.register(User, UserAdmin)
+propz_admin_site.register(User, UserAdmin)
 

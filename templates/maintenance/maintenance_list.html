@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}Maintenance Requests - PRAMMS{% endblock %}
+{% block title %}Maintenance Requests - Propz{% endblock %}
 
 {% block content %}
 <div class="dashboard container">
@@ -34,7 +34,7 @@
     </div>
     {% else %}
     <div class="empty-state card">
-        <div class="empty-state-icon">🔧</div>
+        <div class="empty-state-icon"><i data-lucide="wrench" class="icon-md"></i></div>
         <h3>No Maintenance Requests</h3>
         {% if user.is_tenant %}
         <p>Need something fixed? Submit a maintenance request.</p>

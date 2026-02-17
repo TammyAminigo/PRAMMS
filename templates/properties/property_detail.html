@@ -1,107 +1,161 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
-{% block title %}{{ property.name }} - PRAMMS{% endblock %}
+{% block title %}{{ property.name }} - Propz{% endblock %}
 
 {% block content %}
 <div class="dashboard container">
     <div class="dashboard-header">
         <div>
-            <a href="{% url 'property_list' %}" style="color: var(--gray-500); font-size: 0.875rem;">← Back to Properties</a>
+            <a href="{% url 'property_list' %}" style="color: var(--accent); font-weight: 500;">← Back to Properties</a>
             <h1 style="margin-top: 0.5rem;">{{ property.name }}</h1>
-            <p style="color: var(--gray-500);">{{ property.address }}</p>
+            <p style="color: var(--gray-500);"><i data-lucide="map-pin" class="icon-xs"></i> {{ property.address }}</p>
         </div>
         <div class="actions">
             <a href="{% url 'property_edit' property.pk %}" class="btn btn-outline">Edit Property</a>
-            {% if not property.is_occupied %}
-            <a href="{% url 'generate_invitation' property.pk %}" class="btn btn-primary">+ Invite Tenant</a>
-            {% endif %}
         </div>
     </div>
 
     <!-- Property Details Card -->
-    <div class="card mb-4">
+    <div class="card" style="margin-bottom: 1.5rem;">
         <div class="card-header">
             <h3 class="card-title">Property Details</h3>
-            <span class="badge {% if property.is_occupied %}badge-occupied{% else %}badge-vacant{% endif %}">{% if property.is_occupied %}Occupied{% else %}Vacant{% endif %}</span>
+            <div style="display: flex; gap: 0.5rem;">
+                <span class="badge {% if property.is_occupied %}badge-occupied{% else %}badge-vacant{% endif %}">
+                    {% if property.is_occupied %}Occupied{% else %}Vacant{% endif %}
+                </span>
+                {% if property.is_available %}
+                <span class="badge badge-success">On Marketplace</span>
+                {% else %}
+                <span class="badge badge-danger">Off Marketplace</span>
+                {% endif %}
+            </div>
         </div>
         <div class="card-body">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Address</p>
-                    <p style="font-weight: 500;">{{ property.address }}</p>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Address</span>
+                    <span class="detail-value">{{ property.address }}</span>
                 </div>
                 {% if property.unit_number %}
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Unit Number</p>
-                    <p style="font-weight: 500;">{{ property.unit_number }}</p>
+                <div class="detail-item">
+                    <span class="detail-label">Unit Number</span>
+                    <span class="detail-value">{{ property.unit_number }}</span>
                 </div>
                 {% endif %}
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Rent ({{ property.get_rent_period_display }})</p>
-                    <p style="font-size: 1.5rem; font-weight: 700; color: var(--accent);">{{ property.formatted_rent }}</p>
+                <div class="detail-item">
+                    <span class="detail-label">Listing Type</span>
+                    <span class="detail-value">{{ property.get_listing_type_display }}</span>
                 </div>
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Added On</p>
-                    <p style="font-weight: 500;">{{ property.created_at|date:"M d, Y" }}</p>
+                <div class="detail-item">
+                    <span class="detail-label">Property Type</span>
+                    <span class="detail-value">{{ property.get_property_type_display }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Rent ({{ property.get_rent_period_display }})</span>
+                    <span class="detail-value" style="font-size: 1.5rem; color: var(--primary); font-weight: 700;">
+                        ₦{{ property.rent_amount|floatformat:"0"|intcomma }}
+                    </span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Added On</span>
+                    <span class="detail-value">{{ property.created_at|date:"M d, Y" }}</span>
                 </div>
             </div>
+            {% if property.description %}
+            <div style="margin-top: 1.5rem; border-top: 1px solid var(--gray-200); padding-top: 1.5rem;">
+                <h4 style="margin-bottom: 0.5rem;">Description</h4>
+                <p style="color: var(--gray-600);">{{ property.description }}</p>
+            </div>
+            {% endif %}
         </div>
     </div>
 
-    <!-- Tenant Info (if occupied) -->
-    {% if property.is_occupied %}
-    <div class="card mb-4">
+    <!-- Active Tenancy -->
+    {% if active_tenancy %}
+    <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--accent);">
         <div class="card-header">
-            <h3 class="card-title">Current Tenant</h3>
-            <a href="{% url 'tenant_delete' property.tenant.pk %}" class="btn btn-danger btn-sm">Remove Tenant</a>
+            <h3 class="card-title"><i data-lucide="key-round" class="icon-md"></i> Current Tenancy</h3>
+            {% if active_tenancy.status == 'active' %}
+            <span class="badge badge-success">Active</span>
+            {% else %}
+            <span class="badge badge-warning">{{ active_tenancy.get_status_display }}</span>
+            {% endif %}
         </div>
         <div class="card-body">
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem;">
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Name</p>
-                    <p style="font-weight: 500;">{{ property.tenant.user.get_full_name }}</p>
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Tenant</span>
+                    <span class="detail-value">{{ active_tenancy.tenant.get_full_name }}</span>
                 </div>
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Email</p>
-                    <p style="font-weight: 500;">{{ property.tenant.user.email }}</p>
+                <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">{{ active_tenancy.tenant.email }}</span>
                 </div>
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Phone</p>
-                    <p style="font-weight: 500;">{{ property.tenant.user.phone|default:"Not provided" }}</p>
+                <div class="detail-item">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">{{ active_tenancy.tenant.phone|default:"Not provided" }}</span>
                 </div>
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Lease Start Date</p>
-                    <p style="font-weight: 500;">{{ property.tenant.move_in_date|date:"M d, Y" }}</p>
+                <div class="detail-item">
+                    <span class="detail-label">Lease Start</span>
+                    <span class="detail-value">{{ active_tenancy.start_date|date:"M d, Y" }}</span>
                 </div>
-                <div>
-                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.25rem;">Lease End Date</p>
-                    <p style="font-weight: 500; color: var(--warning);">{{ property.tenant.lease_end_date|date:"M d, Y" }}</p>
+                <div class="detail-item">
+                    <span class="detail-label">Lease End</span>
+                    <span class="detail-value">{{ active_tenancy.lease_end_date|date:"M d, Y"|default:"N/A" }}</span>
                 </div>
+                {% if active_tenancy.days_remaining is not None %}
+                <div class="detail-item">
+                    <span class="detail-label">Days Remaining</span>
+                    <span class="detail-value"
+                        style="{% if active_tenancy.days_remaining < 30 %}color: var(--danger){% elif active_tenancy.days_remaining < 90 %}color: var(--warning){% else %}color: var(--accent){% endif %}">
+                        {{ active_tenancy.days_remaining }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+            <div class="card-footer">
+                <a href="{% url 'tenancy_detail' pk=active_tenancy.pk %}" class="btn btn-outline btn-sm">View Tenancy
+                    Details</a>
+                {% if active_tenancy.status == 'active' %}
+                <a href="{% url 'terminate_tenancy' pk=active_tenancy.pk %}" class="btn btn-danger btn-sm">Request
+                    Termination</a>
+                {% endif %}
             </div>
         </div>
     </div>
     {% endif %}
 
-    <!-- Active Invitations -->
-    {% if invitations %}
-    <div class="card mb-4">
+    <!-- Pending Applications -->
+    {% if pending_applications %}
+    <div class="card" style="margin-bottom: 1.5rem;">
         <div class="card-header">
-            <h3 class="card-title">Pending Invitations</h3>
+            <h3 class="card-title"><i data-lucide="clipboard-list" class="icon-md"></i> Pending Applications ({{
+                pending_applications.count }})</h3>
+            <a href="{% url 'applications_list' %}" class="btn btn-outline btn-sm">View All</a>
         </div>
         <div class="card-body">
-            {% for invitation in invitations %}
-            <div style="padding: 1rem; background: var(--gray-100); border-radius: var(--radius); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
-                <div style="flex: 1;">
-                    <p style="font-size: 0.875rem; color: var(--gray-500);">Invitation Link (expires {{ invitation.expires_at|date:"M d, Y" }}):</p>
-                    <code style="word-break: break-all; font-size: 0.875rem;">{{ request.scheme }}://{{ request.get_host }}{% url 'accept_invitation' invitation.token %}</code>
-                    {% if invitation.tenant_email %}
-                    <p style="margin-top: 0.5rem; font-size: 0.875rem;">Sent to: {{ invitation.tenant_email }}</p>
-                    {% endif %}
+            {% for app in pending_applications %}
+            <div
+                style="padding: 1rem; background: var(--gray-100); border-radius: var(--radius); margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div
+                        style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.85rem;">
+                        {{ app.tenant.first_name.0 }}{{ app.tenant.last_name.0 }}
+                    </div>
+                    <div>
+                        <p style="font-weight: 600;">{{ app.tenant.get_full_name }}</p>
+                        <p style="color: var(--gray-500); font-size: 0.8rem;">{{ app.created_at|timesince }} ago</p>
+                    </div>
                 </div>
-                <form method="post" action="{% url 'invitation_delete' invitation.pk %}" style="flex-shrink: 0;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Cancel this invitation?');">Cancel</button>
-                </form>
+                <div style="display: flex; gap: 0.5rem;">
+                    <a href="{% url 'accept_application' pk=app.pk %}" class="btn btn-primary btn-sm">Accept</a>
+                    <form method="POST" action="{% url 'reject_application' pk=app.pk %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Reject this application?')">Reject</button>
+                    </form>
+                </div>
             </div>
             {% endfor %}
         </div>
@@ -111,7 +165,8 @@
     <!-- Delete Property -->
     <div style="margin-top: 2rem; text-align: center;">
         <a href="{% url 'property_delete' property.pk %}" class="btn btn-danger">Delete Property</a>
-        <p style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.5rem;">Permanently delete this property and all associated data.</p>
+        <p style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.5rem;">Permanently delete this property and
+            all associated data.</p>
     </div>
 </div>
 {% endblock %}

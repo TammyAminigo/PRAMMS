@@ -1,120 +1,159 @@
 {% extends 'base.html' %}
 
-{% block title %}Dashboard - PRAMMS{% endblock %}
+{% block title %}Landlord Dashboard - Propz{% endblock %}
 
 {% block content %}
-<div class="dashboard container">
-    <div class="dashboard-header">
+<section class="dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <h1>Welcome, {{ user.first_name }}! </h1>
+            <div class="actions">
+                <a href="{% url 'property_add' %}" class="btn btn-primary">+ Add Property</a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon primary"><i data-lucide="house" class="icon-md"></i></div>
+                <div class="stat-content">
+                    <h3>{{ properties_count }}</h3>
+                    <p>Total Properties</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon success"><i data-lucide="check-circle" class="icon-md"></i></div>
+                <div class="stat-content">
+                    <h3>{{ occupied_count }}</h3>
+                    <p>Occupied</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon warning"><i data-lucide="building" class="icon-md"></i></div>
+                <div class="stat-content">
+                    <h3>{{ vacant_count }}</h3>
+                    <p>Vacant / Available</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon danger"><i data-lucide="wrench" class="icon-md"></i></div>
+                <div class="stat-content">
+                    <h3>{{ pending_requests }}</h3>
+                    <p>Pending Maintenance</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pending Applications -->
+        {% if pending_applications_count > 0 %}
+        <div style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 class="section-title" style="margin-bottom: 0;"><i data-lucide="clipboard-list" class="icon-md"></i> Pending Applications ({{ pending_applications_count  }})</h2>
+                <a href="{% url 'applications_list' %}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            <div class="request-list">
+                {% for app in pending_applications|slice:":3" %}
+                <div class="card" style="margin-bottom: 0.75rem;">
+                    <div
+                        style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div
+                                style="width: 36px; height: 36px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 0.85rem;">
+                                {{ app.tenant.first_name.0 }}{{ app.tenant.last_name.0 }}
+                            </div>
+                            <div>
+                                <p style="font-weight: 600;">{{ app.tenant.get_full_name }}</p>
+                                <p style="color: var(--gray-500); font-size: 0.8rem;">for {{ app.rental_property.name }}
+                                    • {{ app.created_at|timesince }} ago</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <a href="{% url 'accept_application' pk=app.pk %}" class="btn btn-primary btn-sm">Accept</a>
+                            <form method="POST" action="{% url 'reject_application' pk=app.pk %}"
+                                style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm"
+                                    onclick="return confirm('Reject?')">Reject</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Active Tenancies -->
+        {% if active_tenancies %}
+        <div style="margin-bottom: 2rem;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 class="section-title" style="margin-bottom: 0;"><i data-lucide="key-round" class="icon-md"></i> Active Tenancies</h2>
+                <a href="{% url 'active_tenancies' %}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            <div class="property-grid">
+                {% for tenancy in active_tenancies|slice:":3" %}
+                <a href="{% url 'tenancy_detail' pk=tenancy.pk %}" class="property-card"
+                    style="text-decoration: none; color: inherit;">
+                    <div class="property-card-image" style="height: 80px;">
+                        <span class="placeholder-icon" style="font-size: 2rem;"><i data-lucide="key-round" class="icon-md"></i></span>
+                        <div style="position: absolute; top: 8px; right: 8px;">
+                            {% if tenancy.status == 'active' %}
+                            <span class="badge badge-success">Active</span>
+                            {% else %}
+                            <span class="badge badge-warning">{{ tenancy.get_status_display }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="property-card-body" style="padding: 1rem;">
+                        <h4 style="font-size: 1rem;">{{ tenancy.rental_property.name }}</h4>
+                        <p style="color: var(--gray-500); font-size: 0.8rem;">Tenant: {{ tenancy.tenant.get_full_name }}
+                        </p>
+                        {% if tenancy.days_remaining is not None %}
+                        <p
+                            style="font-size: 0.75rem; margin-top: 0.25rem; color: {% if tenancy.days_remaining < 30 %}var(--danger){% else %}var(--gray-500){% endif %};">
+                            {{ tenancy.days_remaining }} days remaining
+                        </p>
+                        {% endif %}
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Recent Maintenance -->
+        {% if maintenance_requests %}
         <div>
-            <h1>Welcome, {{ user.username }}!</h1>
-            <p style="color: var(--gray-500);">Here's an overview of your properties and recent activity.</p>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 class="section-title" style="margin-bottom: 0;"><i data-lucide="wrench" class="icon-md"></i> Recent Maintenance Requests</h2>
+                <a href="{% url 'maintenance_list' %}" class="btn btn-outline btn-sm">View All</a>
+            </div>
+            <div class="request-list">
+                {% for request in maintenance_requests %}
+                <a href="{% url 'maintenance_detail' pk=request.pk %}" class="request-item"
+                    style="text-decoration: none; color: inherit;">
+                    <div class="request-priority {{ request.priority }}"></div>
+                    <div class="request-content">
+                        <h4>{{ request.title }}</h4>
+                        <p>{{ request.property.name }} • {{ request.created_at|timesince }} ago</p>
+                    </div>
+                    <div class="request-meta">
+                        <span class="badge badge-{{ request.status }}">{{ request.get_status_display }}</span>
+                    </div>
+                </a>
+                {% endfor %}
+            </div>
         </div>
-        <div class="actions">
-            <a href="{% url 'property_add' %}" class="btn btn-primary">+ Add Property</a>
+        {% endif %}
+
+        {% if not properties_count %}
+        <div class="empty-state" style="margin-top: 2rem;">
+            <div class="empty-state-icon"><i data-lucide="house" class="icon-md"></i></div>
+            <h3>No Properties Yet</h3>
+            <p>Add your first property to get started on the marketplace.</p>
+            <a href="{% url 'property_add' %}" class="btn btn-primary" style="margin-top: 1rem;">+ Add Property</a>
         </div>
+        {% endif %}
     </div>
-
-    <!-- Stats -->
-    <div class="stats-grid">
-        <div class="stat-card">
-            <div class="stat-icon primary">🏠</div>
-            <div class="stat-content">
-                <h3>{{ properties_count }}</h3>
-                <p>Total Properties</p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon success">✓</div>
-            <div class="stat-content">
-                <h3>{{ occupied_count }}</h3>
-                <p>Occupied Units</p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon warning">○</div>
-            <div class="stat-content">
-                <h3>{{ vacant_count }}</h3>
-                <p>Vacant Units</p>
-            </div>
-        </div>
-
-        <div class="stat-card">
-            <div class="stat-icon danger">🔧</div>
-            <div class="stat-content">
-                <h3>{{ pending_requests }}</h3>
-                <p>Pending Requests</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Properties Section -->
-    <h2 class="section-title">Your Properties</h2>
-
-    {% if properties %}
-    <div class="property-grid">
-        {% for property in properties %}
-        <div class="property-card">
-            <div class="property-card-image">
-                {% if property.image %}
-                <img src="{{ property.image.url }}" alt="{{ property.name }}">
-                {% else %}
-                <span class="placeholder-icon">🏠</span>
-                {% endif %}
-            </div>
-            <div class="property-card-body">
-                <h4>{{ property.name }}</h4>
-                <p class="address">{{ property.address|truncatechars:50 }}</p>
-                <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span class="rent">{{ property.formatted_rent }}<span>/{{ property.get_rent_period_display }}</span></span>
-                    <span class="badge {% if property.is_occupied %}badge-occupied{% else %}badge-vacant{% endif %}">{% if property.is_occupied %}Occupied{% else %}Vacant{% endif %}</span>
-                </div>
-                <div class="card-footer">
-                    <a href="{% url 'property_detail' property.pk %}" class="btn btn-outline btn-sm">View Details</a>
-                    {% if not property.is_occupied %}
-                    <a href="{% url 'generate_invitation' property.pk %}" class="btn btn-primary btn-sm">Invite Tenant</a>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-    </div>
-    {% else %}
-    <div class="empty-state card">
-        <div class="empty-state-icon">🏠</div>
-        <h3>No Properties Yet</h3>
-        <p>Start by adding your first property to the system.</p>
-        <a href="{% url 'property_add' %}" class="btn btn-primary mt-2">+ Add Property</a>
-    </div>
-    {% endif %}
-
-    <!-- Recent Maintenance Requests -->
-    <h2 class="section-title mt-4">Recent Maintenance Requests</h2>
-
-    {% if maintenance_requests %}
-    <div class="request-list">
-        {% for request in maintenance_requests %}
-        <a href="{% url 'maintenance_detail' request.pk %}" class="request-item">
-            <div class="request-priority {{ request.priority }}"></div>
-            <div class="request-content">
-                <h4>{{ request.title }}</h4>
-                <p>{{ request.property.name }} • {{ request.tenant.get_full_name }}</p>
-            </div>
-            <div class="request-meta">
-                <span class="badge badge-{% if request.status == 'pending' %}warning{% elif request.status == 'completed' %}success{% else %}info{% endif %}">{{ request.get_status_display }}</span>
-                <p class="mt-1">{{ request.created_at|timesince }} ago</p>
-            </div>
-        </a>
-        {% endfor %}
-    </div>
-    <a href="{% url 'maintenance_list' %}" class="btn btn-outline mt-2">View All Requests</a>
-    {% else %}
-    <div class="empty-state card">
-        <div class="empty-state-icon">🔧</div>
-        <h3>No Maintenance Requests</h3>
-        <p>Maintenance requests from your tenants will appear here.</p>
-    </div>
-    {% endif %}
-</div>
+</section>
 {% endblock %}

@@ -1,24 +1,25 @@
 {% extends 'base.html' %}
 
-{% block title %}Login - PRAMMS{% endblock %}
+{% block title %}Sign In - Propz{% endblock %}
 
 {% block content %}
 <div class="auth-container">
     <div class="auth-card">
-        <h2>Welcome Back</h2>
-        <p class="subtitle">Login to access your dashboard</p>
+        <h2>Welcome Back to Propz</h2>
+        <p class="subtitle">Sign in to your account</p>
+
+        {% if messages %}
+        {% for message in messages %}
+        <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
 
         <form method="post" novalidate>
             {% csrf_token %}
-
-            {% if form.non_field_errors %}
-            <div class="alert alert-error" style="margin-bottom: 1.5rem; position: static;">
-                {{ form.non_field_errors.0 }}
-            </div>
-            {% endif %}
+            {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
 
             <div class="form-group">
-                <label class="form-label" for="id_username">Username</label>
+                <label class="form-label" for="id_username">Username or Email</label>
                 {{ form.username }}
                 {% if form.username.errors %}
                 <p class="form-error">{{ form.username.errors.0 }}</p>
@@ -27,18 +28,84 @@
 
             <div class="form-group">
                 <label class="form-label" for="id_password">Password</label>
-                {{ form.password }}
+                <div class="password-wrapper">
+                    {{ form.password }}
+                    <button type="button" class="password-toggle" onclick="togglePassword('id_password', this)">
+                        <i data-lucide="eye" class="icon-sm"></i>
+                    </button>
+                </div>
                 {% if form.password.errors %}
                 <p class="form-error">{{ form.password.errors.0 }}</p>
                 {% endif %}
             </div>
 
-            <button type="submit" class="btn btn-primary">Login</button>
+            {% if form.non_field_errors %}
+            <div class="form-error-block">
+                {% for error in form.non_field_errors %}
+                <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Sign In</button>
         </form>
 
         <p class="auth-footer">
-            Don't have an account? <a href="{% url 'register' %}">Register as Landlord</a>
+            Don't have an account? <a href="{% url 'register' %}">Sign up here</a>
         </p>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .password-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .password-wrapper .form-input {
+        padding-right: 50px;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 12px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--gray-500);
+        transition: color 0.2s;
+    }
+
+    .password-toggle:hover {
+        color: var(--accent);
+    }
+
+    .form-error-block {
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function togglePassword(inputId, button) {
+        const input = document.getElementById(inputId);
+        const icon = button.querySelector('[data-lucide]');
+        if (input.type === 'password') {
+            input.type = 'text';
+            icon.setAttribute('data-lucide', 'eye-off');
+        } else {
+            input.type = 'password';
+            icon.setAttribute('data-lucide', 'eye');
+        }
+        lucide.createIcons();
+    }
+</script>
 {% endblock %}

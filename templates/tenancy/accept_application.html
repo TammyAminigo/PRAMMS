@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load humanize %}
+
+{% block title %}Accept Application - Propz{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="container">
+        <div style="max-width: 640px; margin: 0 auto;">
+            <div style="margin-bottom: 1.5rem;">
+                <a href="{% url 'applications_list' %}" style="color: var(--accent); font-weight: 500;">← Back to
+                    Applications</a>
+            </div>
+
+            <div class="card">
+                <h2 style="margin-bottom: 0.5rem;">Accept Application</h2>
+                <p style="color: var(--gray-500); margin-bottom: 2rem;">Confirm this tenant for your property</p>
+
+                <!-- Tenant Info -->
+                <div
+                    style="background: var(--gray-100); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 1.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                        <div
+                            style="width: 48px; height: 48px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600; font-size: 1.1rem;">
+                            {{ application.tenant.first_name.0 }}{{ application.tenant.last_name.0 }}
+                        </div>
+                        <div>
+                            <p style="font-weight: 600; font-size: 1.1rem;">{{ application.tenant.get_full_name }}</p>
+                            <p style="color: var(--gray-500); font-size: 0.875rem;">{{ application.tenant.email }}</p>
+                        </div>
+                    </div>
+                    {% if application.message %}
+                    <p style="font-size: 0.875rem; color: var(--gray-600); font-style: italic; margin-top: 0.75rem;">
+                        "{{ application.message }}"
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Property Info -->
+                <div
+                    style="background: var(--gray-100); border-radius: var(--radius); padding: 1.25rem; margin-bottom: 2rem;">
+                    <h4>{{ application.rental_property.name }}</h4>
+                    <p style="color: var(--gray-500); font-size: 0.875rem;"><i data-lucide="map-pin"
+                            class="icon-xs"></i> {{ application.rental_property.address }}
+                    </p>
+                    <p style="color: var(--primary); font-weight: 700; font-size: 1.25rem; margin-top: 0.5rem;">
+                        ₦{{ application.rental_property.rent_amount|floatformat:"0"|intcomma }} / {{ application.rental_property.get_rent_period_display }}
+                    </p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label class="form-label" for="start_date">Tenancy Start Date</label>
+                        <input type="date" name="start_date" id="start_date" class="form-input" required>
+                        <p class="form-help">Set the date the tenancy begins.</p>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <button type="submit" class="btn btn-primary btn-lg" style="flex: 1;">
+                            Confirm & Create Tenancy
+                        </button>
+                        <a href="{% url 'applications_list' %}" class="btn btn-outline"
+                            style="flex: 0 0 auto;">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

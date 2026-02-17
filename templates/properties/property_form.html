@@ -1,15 +1,52 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ title }} - PRAMMS{% endblock %}
+{% block title %}{{ title }} - Propz{% endblock %}
 
 {% block content %}
 <div class="auth-container">
-    <div class="auth-card" style="max-width: 520px;">
+    <div class="auth-card" style="max-width: 600px;">
         <h2>{{ title }}</h2>
         <p class="subtitle">{% if property %}Update property details{% else %}Add a new property to your portfolio{% endif %}</p>
 
-        <form method="post" novalidate>
+        <form method="post" enctype="multipart/form-data" novalidate id="propertyForm">
             {% csrf_token %}
+
+            <!-- Listing Type Cards -->
+            <div class="listing-type-section">
+                <label class="form-label">What do you want to do?</label>
+                <div class="listing-type-cards">
+                    <div class="listing-card" data-type="rent" onclick="selectListingType('rent')">
+                        <div class="listing-card-check">
+                            <i data-lucide="check-circle-2" class="icon-md"></i>
+                        </div>
+                        <i data-lucide="key-round" class="icon-lg listing-card-icon"></i>
+                        <h4>For Rent</h4>
+                        <p>List your property for monthly or annual rent</p>
+                    </div>
+                    <div class="listing-card" data-type="sale" onclick="selectListingType('sale')">
+                        <div class="listing-card-check">
+                            <i data-lucide="check-circle-2" class="icon-md"></i>
+                        </div>
+                        <i data-lucide="banknote" class="icon-lg listing-card-icon"></i>
+                        <h4>For Sale</h4>
+                        <p>List your property for outright purchase</p>
+                    </div>
+                </div>
+                {{ form.listing_type }}
+            </div>
+
+            {% if form.listing_type.errors %}
+            <p class="form-error" style="margin-bottom: 1rem;">{{ form.listing_type.errors.0 }}</p>
+            {% endif %}
+
+            <!-- Property Details -->
+            <div class="form-group">
+                <label class="form-label" for="id_property_type">Property Type</label>
+                {{ form.property_type }}
+                {% if form.property_type.errors %}
+                <p class="form-error">{{ form.property_type.errors.0 }}</p>
+                {% endif %}
+            </div>
 
             <div class="form-group">
                 <label class="form-label" for="id_name">Property Name</label>
@@ -29,32 +66,198 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label" for="id_state">State / Location</label>
+                {{ form.state }}
+                {% if form.state.errors %}
+                <p class="form-error">{{ form.state.errors.0 }}</p>
+                {% endif %}
+            </div>
+
+            <div class="form-group">
                 <label class="form-label" for="id_unit_number">Unit Number (Optional)</label>
                 {{ form.unit_number }}
                 <p class="form-help">Apartment/unit number if applicable</p>
             </div>
 
             <div class="form-group">
-                <label class="form-label" for="id_rent_amount">Rent Amount (₦)</label>
-                {{ form.rent_amount }}
-                {% if form.rent_amount.errors %}
-                <p class="form-error">{{ form.rent_amount.errors.0 }}</p>
+                <label class="form-label" for="id_description">Description</label>
+                {{ form.description }}
+                {% if form.description.errors %}
+                <p class="form-error">{{ form.description.errors.0 }}</p>
                 {% endif %}
+                <p class="form-help">Describe the property for potential buyers or tenants</p>
             </div>
 
+            <!-- Price section -->
+            <div class="form-row">
+                <div class="form-group" style="flex: 1;">
+                    <label class="form-label" for="id_rent_amount" id="priceLabel">Price (₦)</label>
+                    {{ form.rent_amount }}
+                    {% if form.rent_amount.errors %}
+                    <p class="form-error">{{ form.rent_amount.errors.0 }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="form-group" style="flex: 1;" id="rentPeriodGroup">
+                    <label class="form-label" for="id_rent_period">Rent Period</label>
+                    {{ form.rent_period }}
+                    {% if form.rent_period.errors %}
+                    <p class="form-error">{{ form.rent_period.errors.0 }}</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Photo upload -->
             <div class="form-group">
-                <label class="form-label" for="id_rent_period">Rent Period</label>
-                {{ form.rent_period }}
-                {% if form.rent_period.errors %}
-                <p class="form-error">{{ form.rent_period.errors.0 }}</p>
+                <label class="form-label" for="id_photo">Property Photo (Optional)</label>
+                {{ form.photo }}
+                {% if form.photo.errors %}
+                <p class="form-error">{{ form.photo.errors.0 }}</p>
                 {% endif %}
+                <p class="form-help">Upload a photo of the property</p>
             </div>
 
-            <div style="display: flex; gap: 1rem;">
+            <!-- Marketplace toggle -->
+            <div class="form-group" style="display: flex; align-items: center; gap: 0.75rem;">
+                {{ form.is_available }}
+                <label class="form-label" for="id_is_available" style="margin: 0;">List on Marketplace</label>
+            </div>
+
+            {% if form.non_field_errors %}
+            <div class="form-error-block" style="margin-bottom: 1rem;">
+                {% for error in form.non_field_errors %}
+                <p class="form-error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
                 <button type="submit" class="btn btn-primary" style="flex: 1;">{% if property %}Update Property{% else %}Add Property{% endif %}</button>
                 <a href="{% url 'property_list' %}" class="btn btn-outline" style="flex: 1;">Cancel</a>
             </div>
         </form>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .listing-type-section {
+        margin-bottom: 1.5rem;
+    }
+
+    .listing-type-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-top: 0.5rem;
+    }
+
+    .listing-card {
+        position: relative;
+        background: var(--white);
+        border: 2px solid var(--gray-200);
+        border-radius: 12px;
+        padding: 1.5rem 1rem;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease;
+    }
+
+    .listing-card:hover {
+        border-color: var(--gray-400);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .listing-card.selected {
+        border-color: #16a34a;
+        background: #f0fdf4;
+    }
+
+    .listing-card-check {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        display: none;
+        color: #16a34a;
+    }
+
+    .listing-card.selected .listing-card-check {
+        display: block;
+    }
+
+    .listing-card-icon {
+        color: var(--gray-600);
+        margin-bottom: 0.5rem;
+    }
+
+    .listing-card.selected .listing-card-icon {
+        color: #16a34a;
+    }
+
+    .listing-card h4 {
+        margin: 0.25rem 0;
+        font-size: 1rem;
+        font-weight: 600;
+    }
+
+    .listing-card p {
+        margin: 0;
+        font-size: 0.8rem;
+        color: var(--gray-500);
+    }
+
+    .form-row {
+        display: flex;
+        gap: 1rem;
+    }
+
+    @media (max-width: 600px) {
+
+        .listing-type-cards,
+        .form-row {
+            grid-template-columns: 1fr;
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function selectListingType(type) {
+        // Update cards
+        document.querySelectorAll('.listing-card').forEach(function (card) {
+            card.classList.remove('selected');
+        });
+        document.querySelector('.listing-card[data-type="' + type + '"]').classList.add('selected');
+
+        // Update hidden input
+        document.getElementById('id_listing_type').value = type;
+
+        // Toggle fields based on type
+        var rentPeriodGroup = document.getElementById('rentPeriodGroup');
+        var priceLabel = document.getElementById('priceLabel');
+
+        if (type === 'sale') {
+            rentPeriodGroup.style.display = 'none';
+            priceLabel.textContent = 'Sale Price (\u20A6)';
+        } else {
+            rentPeriodGroup.style.display = '';
+            priceLabel.textContent = 'Rent Amount (\u20A6)';
+        }
+
+        // Re-render icons after DOM changes
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    }
+
+    // On page load, select the correct card based on existing value
+    document.addEventListener('DOMContentLoaded', function () {
+        var currentType = document.getElementById('id_listing_type').value || 'rent';
+        selectListingType(currentType);
+    });
+</script>
 {% endblock %}

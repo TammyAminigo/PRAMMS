@@ -19,6 +19,9 @@ class User(AbstractUser):
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='landlord')
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     phone = models.CharField(max_length=20, blank=True)
+    whatsapp_number = models.CharField(max_length=20, blank=True, help_text="WhatsApp phone number")
+    telegram_username = models.CharField(max_length=50, blank=True, help_text="Telegram username (without @)")
+    show_phone = models.BooleanField(default=False, help_text="Allow others to see your full phone number")
     profile_picture = models.ImageField(upload_to='profile_pictures/', blank=True, null=True)
     
     class Meta:

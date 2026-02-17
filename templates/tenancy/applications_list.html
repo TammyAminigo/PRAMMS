@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Tenant Applications - Propz{% endblock %}
+
+{% block content %}
+<section class="dashboard">
+    <div class="container">
+        <div class="dashboard-header">
+            <div>
+                <h1>Tenant Applications</h1>
+                <p style="color: var(--gray-500);">{{ pending_count }} pending application{{ pending_count|pluralize }}
+                </p>
+            </div>
+            <a href="{% url 'landlord_dashboard' %}" class="btn btn-outline">← Back to Dashboard</a>
+        </div>
+
+        {% if applications %}
+        <div class="request-list">
+            {% for app in applications %}
+            <div class="card" style="margin-bottom: 1rem;">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem;">
+                    <div style="flex: 1;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.75rem;">
+                            <div
+                                style="width: 40px; height: 40px; border-radius: 50%; background: var(--primary-light); display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                {{ app.tenant.first_name.0 }}{{ app.tenant.last_name.0 }}
+                            </div>
+                            <div>
+                                <p style="font-weight: 600;">{{ app.tenant.get_full_name }}</p>
+                                <p style="color: var(--gray-500); font-size: 0.8rem;">{{ app.tenant.email }}</p>
+                            </div>
+                        </div>
+                        <p style="font-size: 0.875rem; color: var(--gray-600); margin-bottom: 0.5rem;">
+                            <strong>Property:</strong> {{ app.rental_property.name }}
+                        </p>
+                        {% if app.message %}
+                        <p style="font-size: 0.875rem; color: var(--gray-500); font-style: italic;">
+                            "{{ app.message|truncatewords:30 }}"
+                        </p>
+                        {% endif %}
+                        {% if app.landlord_reply %}
+                        <div
+                            style="background: var(--primary-light); background: rgba(76, 175, 80, 0.08); border-left: 3px solid var(--accent); padding: 0.5rem 0.75rem; border-radius: 0 var(--radius) var(--radius) 0; margin-top: 0.5rem;">
+                            <p
+                                style="font-size: 0.75rem; font-weight: 600; color: var(--accent); margin-bottom: 0.25rem;">
+                                Your Reply:</p>
+                            <p style="font-size: 0.875rem; color: var(--gray-600);">{{ app.landlord_reply }}</p>
+                        </div>
+                        {% endif %}
+                        <p style="font-size: 0.8rem; color: var(--gray-400); margin-top: 0.5rem;">
+                            Applied {{ app.created_at|timesince }} ago
+                        </p>
+                        {% if app.status == 'pending' and not app.landlord_reply %}
+                        <form method="POST" action="{% url 'reply_to_application' pk=app.pk %}"
+                            style="margin-top: 0.75rem;">
+                            {% csrf_token %}
+                            <div style="display: flex; gap: 0.5rem; align-items: flex-end;">
+                                <textarea name="landlord_reply" rows="2" class="form-input"
+                                    placeholder="Write a reply to this tenant..."
+                                    style="flex: 1; font-size: 0.85rem; resize: vertical;"></textarea>
+                                <button type="submit" class="btn btn-primary btn-sm" style="white-space: nowrap;">
+                                    <i data-lucide="send" class="icon-xs"></i> Reply
+                                </button>
+                            </div>
+                        </form>
+                        {% endif %}
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 0.75rem;">
+                        {% if app.status == 'pending' %}
+                        <span class="badge badge-warning">Pending</span>
+                        <a href="{% url 'accept_application' pk=app.pk %}" class="btn btn-primary btn-sm">Accept</a>
+                        <form method="POST" action="{% url 'reject_application' pk=app.pk %}" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Reject this application?')">Reject</button>
+                        </form>
+                        {% elif app.status == 'accepted' %}
+                        <span class="badge badge-success">Accepted</span>
+                        {% elif app.status == 'rejected' %}
+                        <span class="badge badge-danger">Rejected</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <div class="empty-state-icon"><i data-lucide="clipboard-list" class="icon-md"></i></div>
+            <h3>No Applications Yet</h3>
+            <p>When tenants apply for your properties, they'll appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

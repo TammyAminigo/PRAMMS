@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import MaintenanceRequest, MaintenanceImage
-from prmms.admin_site import pramms_admin_site
+from prmms.admin_site import propz_admin_site
 
 
 class MaintenanceImageInline(admin.TabularInline):
@@ -23,6 +23,6 @@ class MaintenanceImageAdmin(admin.ModelAdmin):
 
 
 # Register with custom admin site
-pramms_admin_site.register(MaintenanceRequest, MaintenanceRequestAdmin)
-pramms_admin_site.register(MaintenanceImage, MaintenanceImageAdmin)
+propz_admin_site.register(MaintenanceRequest, MaintenanceRequestAdmin)
+propz_admin_site.register(MaintenanceImage, MaintenanceImageAdmin)
 
