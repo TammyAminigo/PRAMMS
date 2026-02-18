@@ -35,12 +35,18 @@ def maintenance_create(request):
         messages.error(request, 'Only tenants can create maintenance requests.')
         return redirect('dashboard')
     
-    try:
-        tenant_profile = request.user.tenant_profile
-        property_obj = tenant_profile.rental_property
-    except:
-        messages.error(request, 'You must be assigned to a property to create maintenance requests.')
+    # Check for active tenancy
+    from tenancy.models import Tenancy
+    active_tenancy = Tenancy.objects.filter(
+        tenant=request.user,
+        status='active'
+    ).first()
+    
+    if not active_tenancy:
+        messages.error(request, 'You must have an active tenancy to create maintenance requests.')
         return redirect('tenant_dashboard')
+    
+    property_obj = active_tenancy.rental_property
     
     if request.method == 'POST':
         form = MaintenanceRequestForm(request.POST)

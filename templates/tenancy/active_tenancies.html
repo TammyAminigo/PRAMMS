@@ -10,7 +10,7 @@
             <h1>Active Tenancies</h1>
             <div class="actions">
                 <a href="{% url 'past_tenancies' %}" class="btn btn-outline">View History</a>
-                <a href="{% url 'dashboard' %}" class="btn btn-outline">← Dashboard</a>
+                <a href="{% url 'dashboard' %}" class="btn btn-outline">&#8592; Dashboard</a>
             </div>
         </div>
 
@@ -32,8 +32,7 @@
                 </div>
                 <div class="property-card-body">
                     <h4>{{ tenancy.rental_property.name }}</h4>
-                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address
-                        }}</p>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address }}</p>
                     <p style="color: var(--gray-500); font-size: 0.875rem;">
                         {% if user.is_landlord %}
                         Tenant: {{ tenancy.tenant.get_full_name }}
@@ -42,7 +41,7 @@
                         {% endif %}
                     </p>
                     <div class="rent" style="margin-top: 0.5rem;">
-                        ₦{{ tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }}
+                        &#8358;{{ tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }}
                         <span>/ {{ tenancy.rental_property.get_rent_period_display }}</span>
                     </div>
                     {% if tenancy.days_remaining is not None %}

@@ -26,10 +26,8 @@
                 </div>
                 <div class="property-card-body">
                     <h4>{{ tenancy.rental_property.name }}</h4>
-                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address }}</p>
-
-                    <p style="color: var(--gray-500); font-size: 0.875rem;">
-                        {{ tenancy.start_date|date:"M d, Y" }} → {{ tenancy.terminated_at|date:"M d, Y"|default:"N/A" }}
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address }}</p> style="color: var(--gray-500); font-size: 0.875rem;">
+                    {{ tenancy.start_date|date:"M d, Y" }} → {{ tenancy.terminated_at|date:"M d, Y"|default:"N/A" }}
                     </p>
                     <p style="color: var(--gray-500); font-size: 0.875rem; margin-top: 0.25rem;">
                         {% if user.is_landlord %}

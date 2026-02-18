@@ -59,8 +59,7 @@
             <!-- Add New Photos -->
             {% if available_slots > 0 %}
             <div class="form-group">
-                <label class="form-label" for="images">Add Photos ({{ available_slots }} slot{{
-                    available_slots|pluralize }} available)</label>
+                <label class="form-label" for="images">Add Photos ({{ available_slots }} slot{{ available_slots|pluralize }} available)</label>
                 <input type="file" name="images" id="images" accept="image/*" multiple class="form-input"
                     style="padding: 0.75rem;">
                 <p class="form-help">You can add up to {{ available_slots }} more photo{{ available_slots|pluralize }}

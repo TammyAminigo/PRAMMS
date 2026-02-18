@@ -130,8 +130,7 @@
     {% if pending_applications %}
     <div class="card" style="margin-bottom: 1.5rem;">
         <div class="card-header">
-            <h3 class="card-title"><i data-lucide="clipboard-list" class="icon-md"></i> Pending Applications ({{
-                pending_applications.count }})</h3>
+            <h3 class="card-title"><i data-lucide="clipboard-list" class="icon-md"></i> Pending Applications ({{ pending_applications.count }})</h3>
             <a href="{% url 'applications_list' %}" class="btn btn-outline btn-sm">View All</a>
         </div>
         <div class="card-body">

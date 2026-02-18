@@ -20,13 +20,12 @@
                 <div
                     style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
                     <div style="flex: 1;">
-                        <h3 style="margin-bottom: 0.5rem;">{{ property.name }}</h3>
+                        <h3 style="margin-bottom: 0.5rem;">{{ active_tenancy.rental_property.name }}</h3>
                         <p style="color: var(--gray-500); margin-bottom: 0.75rem;"><i data-lucide="map-pin"
-                                class="icon-xs"></i> {{ property.address }}</p>
+                                class="icon-xs"></i> {{ active_tenancy.rental_property.address }}</p>
                         <p style="color: var(--primary); font-weight: 700; font-size: 1.5rem;">
-                            ₦{{ property.rent_amount|floatformat:"0"|intcomma }}
-                            <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-500);">/ {{
-                                property.get_rent_period_display }}</span>
+                            &#8358;{{ active_tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }}
+                            <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-500);">/ {{ active_tenancy.rental_property.get_rent_period_display }}</span>
                         </p>
                     </div>
                     <div style="text-align: center; min-width: 120px;">
@@ -97,10 +96,8 @@
                         <div style="flex: 1;">
                             <p style="font-weight: 600;">{{ app.rental_property.name }}</p>
                             <p style="color: var(--gray-500); font-size: 0.8rem;"><i data-lucide="map-pin"
-                                    class="icon-xs"></i> {{ app.rental_property.address }}
-                            </p>
-                            <p style="color: var(--gray-400); font-size: 0.75rem; margin-top: 0.25rem;">Applied {{
-                                app.created_at|timesince }} ago</p>
+                                    class="icon-xs"></i> {{ app.rental_property.address }}</p>
+                            <p style="color: var(--gray-400); font-size: 0.75rem; margin-top: 0.25rem;">Applied {{ app.created_at|timesince }} ago</p>
                             {% if app.landlord_reply %}
                             <div
                                 style="background: rgba(76, 175, 80, 0.08); border-left: 3px solid var(--accent); padding: 0.5rem 0.75rem; border-radius: 0 var(--radius) var(--radius) 0; margin-top: 0.5rem;">

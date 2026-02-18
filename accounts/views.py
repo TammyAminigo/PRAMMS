@@ -263,7 +263,7 @@ def tenant_dashboard(request):
     ).select_related('rental_property').order_by('-end_date')[:3]
     
     context = {
-        'current_tenancy': current_tenancy,
+        'active_tenancy': current_tenancy,
         'pending_applications': pending_applications,
         'maintenance_requests': maintenance_requests,
         'past_tenancies': past_tenancies,

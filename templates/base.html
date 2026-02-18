@@ -219,6 +219,31 @@
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>lucide.createIcons();</script>
 
+    <script>
+        // Active Navigation Highlighting
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentPath = window.location.pathname;
+            const navLinks = document.querySelectorAll('.nav-link');
+
+            navLinks.forEach(link => {
+                // Use pathname to ignore query parameters (e.g. ?listing_type=sale)
+                if (link.pathname === window.location.pathname && link.getAttribute('href') !== '#') {
+                    link.classList.add('active');
+                }
+            });
+
+            // Apply active styling to match hover state
+            const style = document.createElement('style');
+            style.innerHTML = `
+                .nav-link.active {
+                    color: var(--white) !important;
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: var(--radius-sm);
+                }
+            `;
+            document.head.appendChild(style);
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 

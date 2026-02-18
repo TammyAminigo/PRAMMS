@@ -38,12 +38,10 @@
                 <div class="card" style="margin-bottom: 1.5rem;">
                     <h3 style="margin-bottom: 1rem;">Property</h3>
                     <h4>{{ tenancy.rental_property.name }}</h4>
-                    <p style="color: var(--gray-500); margin-bottom: 0.75rem;"><i data-lucide="map-pin"
-                            class="icon-xs"></i> {{ tenancy.rental_property.address }}
-                    </p>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address }}</p>
                     <p style="color: var(--primary); font-weight: 700; font-size: 1.5rem;">
                         ₦{{ tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }}
-                        <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-500);">/ {{ tenancy.rental_property.get_rent_period_display  }}</span>
+                        <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-500);">/ {{ tenancy.rental_property.get_rent_period_display }}</span>
                     </p>
                 </div>
 
@@ -128,7 +126,7 @@
                         </div>
                         <div>
                             <p style="font-weight: 600;">
-                                {% if is_landlord %}{{ tenancy.tenant.get_full_name }}{% else %}{{ tenancy.landlord.get_full_name  }}{% endif %}
+                                {% if is_landlord %}{{ tenancy.tenant.get_full_name }}{% else %}{{ tenancy.landlord.get_full_name }}{% endif %}
                             </p>
                             <p style="color: var(--gray-500); font-size: 0.875rem;">
                                 {% if is_landlord %}{{ tenancy.tenant.email }}{% else %}{{ tenancy.landlord.email }}{% endif %}
