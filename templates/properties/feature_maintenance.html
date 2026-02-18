@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}Maintenance Requests | Propz{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section
+    style="background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); padding: 4rem 0; text-align: center;">
+    <div class="container">
+        <div
+            style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.15); margin-bottom: 1.5rem;">
+            <i data-lucide="wrench" style="width: 32px; height: 32px; color: white;"></i>
+        </div>
+        <h1 style="color: white; margin-bottom: 0.75rem; font-size: 2.25rem;">Maintenance Requests</h1>
+        <p style="color: var(--gray-300); max-width: 600px; margin: 0 auto; font-size: 1.1rem;">
+            Submit, track, and resolve maintenance issues seamlessly during your tenancy.
+        </p>
+    </div>
+</section>
+
+<!-- Overview -->
+<section style="padding: 4rem 0;">
+    <div class="container" style="max-width: 800px;">
+        <div class="card" style="padding: 2.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: var(--primary-light); flex-shrink: 0;">
+                    <i data-lucide="tool" style="width: 22px; height: 22px; color: var(--primary);"></i>
+                </div>
+                <h2 style="margin: 0; font-size: 1.5rem;">How Maintenance Works</h2>
+            </div>
+            <p style="color: var(--gray-600); line-height: 1.8; margin-bottom: 1.25rem;">
+                Things break, it's a fact of life. What matters is how quickly and transparently issues get resolved.
+                Propz provides a <strong>built-in maintenance request system</strong> that connects tenants and
+                landlords
+                around property issues, keeping everything documented and easy to follow.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Details -->
+<section style="padding: 0 0 4rem;">
+    <div class="container" style="max-width: 800px;">
+        <div class="card" style="padding: 2.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #e8f5e9; flex-shrink: 0;">
+                    <i data-lucide="clipboard-list" style="width: 22px; height: 22px; color: #2e7d32;"></i>
+                </div>
+                <h2 style="margin: 0; font-size: 1.5rem;">For Tenants</h2>
+            </div>
+            <div style="background: var(--gray-50); border-radius: 12px; padding: 1.5rem; margin-bottom: 1.25rem;">
+                <ul style="color: var(--gray-600); line-height: 1.9; padding-left: 1.25rem; margin: 0;">
+                    <li><strong>Submit requests:</strong> describe the issue, set its priority (low, medium, high,
+                        or emergency), and submit it to your landlord.</li>
+                    <li><strong>Attach photos:</strong> upload images of the issue for clarity.</li>
+                    <li><strong>Track progress:</strong> see real-time status updates as your request moves through the
+                        resolution process.</li>
+                </ul>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #fff3e0; flex-shrink: 0;">
+                    <i data-lucide="hard-hat" style="width: 22px; height: 22px; color: #e65100;"></i>
+                </div>
+                <h2 style="margin: 0; font-size: 1.5rem;">For Landlords</h2>
+            </div>
+            <div style="background: var(--gray-50); border-radius: 12px; padding: 1.5rem;">
+                <ul style="color: var(--gray-600); line-height: 1.9; padding-left: 1.25rem; margin: 0;">
+                    <li><strong>Get notified:</strong> see new requests in your dashboard with a notification badge.
+                    </li>
+                    <li><strong>Update status:</strong> move requests through stages (pending, in progress,
+                        completed) so tenants always know what's happening.</li>
+                    <li><strong>Maintain records:</strong> all resolved and open issues are logged for future
+                        reference.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

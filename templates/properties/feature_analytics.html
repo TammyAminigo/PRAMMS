@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Property Analytics | Propz{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section
+    style="background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); padding: 4rem 0; text-align: center;">
+    <div class="container">
+        <div
+            style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.15); margin-bottom: 1.5rem;">
+            <i data-lucide="bar-chart-3" style="width: 32px; height: 32px; color: white;"></i>
+        </div>
+        <h1 style="color: white; margin-bottom: 0.75rem; font-size: 2.25rem;">Property Analytics</h1>
+        <p style="color: var(--gray-300); max-width: 600px; margin: 0 auto; font-size: 1.1rem;">
+            Clear insights for landlords: vacancy tracking, rent monitoring, and tenancy history.
+        </p>
+    </div>
+</section>
+
+<!-- Overview -->
+<section style="padding: 4rem 0;">
+    <div class="container" style="max-width: 800px;">
+        <div class="card" style="padding: 2.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: var(--primary-light); flex-shrink: 0;">
+                    <i data-lucide="layout-dashboard" style="width: 22px; height: 22px; color: var(--primary);"></i>
+                </div>
+                <h2 style="margin: 0; font-size: 1.5rem;">Your Dashboard at a Glance</h2>
+            </div>
+            <p style="color: var(--gray-600); line-height: 1.8; margin-bottom: 1.25rem;">
+                Managing rental properties involves keeping track of many moving parts. Propz gives landlords
+                <strong>real-time insights</strong> into their portfolio, so every decision, from pricing to vacancies,
+                is backed by actual data.
+            </p>
+            <p style="color: var(--gray-600); line-height: 1.8; margin-bottom: 1.25rem;">
+                When you log in as a landlord, your dashboard provides a centralised overview of everything that
+                matters.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Features -->
+<section style="padding: 0 0 4rem;">
+    <div class="container" style="max-width: 800px;">
+        <div class="card" style="padding: 2.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #e8f5e9; flex-shrink: 0;">
+                    <i data-lucide="trending-up" style="width: 22px; height: 22px; color: #2e7d32;"></i>
+                </div>
+                <h2 style="margin: 0; font-size: 1.5rem;">What You Can Track</h2>
+            </div>
+
+            <div style="background: var(--gray-50); border-radius: 12px; padding: 1.5rem;">
+                <ul style="color: var(--gray-600); line-height: 1.9; padding-left: 1.25rem; margin: 0;">
+                    <li><strong>Total properties:</strong> see your entire portfolio at a glance with availability
+                        status.</li>
+                    <li><strong>Vacancy tracking:</strong> instantly know which properties are occupied and which are
+                        vacant.</li>
+                    <li><strong>Rent monitoring:</strong> track expected monthly income across all your properties.</li>
+                    <li><strong>Tenancy history:</strong> view past and current tenants for each property.</li>
+                    <li><strong>Application overview:</strong> monitor pending applications and respond quickly.</li>
+                    <li><strong>Maintenance summary:</strong> keep tabs on open, in-progress, and resolved maintenance
+                        requests.</li>
+                </ul>
+            </div>
+
+            <div style="background: var(--gray-50); border-radius: 12px; padding: 1.5rem; margin-top: 1.25rem;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--gray-800);">
+                    <i data-lucide="lightbulb" class="icon-sm"
+                        style="vertical-align: middle; color: var(--accent);"></i>
+                    Data-Driven Decisions
+                </h3>
+                <p style="color: var(--gray-600); line-height: 1.8; margin: 0;">
+                    With all this information in one place, you can spot vacancy trends, stay on top of tenant
+                    applications, and ensure maintenance issues are resolved promptly, all from a single dashboard.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

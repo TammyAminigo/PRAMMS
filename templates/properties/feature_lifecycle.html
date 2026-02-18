@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+
+{% block title %}Lifecycle Management | Propz{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section
+    style="background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 100%); padding: 4rem 0; text-align: center;">
+    <div class="container">
+        <div
+            style="display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: 50%; background: rgba(255,255,255,0.15); margin-bottom: 1.5rem;">
+            <i data-lucide="refresh-cw" style="width: 32px; height: 32px; color: white;"></i>
+        </div>
+        <h1 style="color: white; margin-bottom: 0.75rem; font-size: 2.25rem;">Lifecycle Management</h1>
+        <p style="color: var(--gray-300); max-width: 600px; margin: 0 auto; font-size: 1.1rem;">
+            From application to lease to termination, every step is tracked.
+        </p>
+    </div>
+</section>
+
+<!-- Overview -->
+<section style="padding: 4rem 0;">
+    <div class="container" style="max-width: 800px;">
+        <div class="card" style="padding: 2.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: var(--primary-light); flex-shrink: 0;">
+                    <i data-lucide="clock" style="width: 22px; height: 22px; color: var(--primary);"></i>
+                </div>
+                <h2 style="margin: 0; font-size: 1.5rem;">What is Lifecycle Management?</h2>
+            </div>
+            <p style="color: var(--gray-600); line-height: 1.8; margin-bottom: 1.25rem;">
+                A tenancy isn't just about signing a lease. It's a <strong>journey with multiple stages</strong>, and
+                Propz tracks the entire lifecycle of every tenancy so that both landlords and tenants always know where
+                things stand.
+            </p>
+            <p style="color: var(--gray-600); line-height: 1.8; margin-bottom: 1.25rem;">
+                From the moment a tenant applies for a property, through approval, active tenancy, and all the way to
+                termination, every transition is recorded, timestamped, and visible to both parties.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Stages -->
+<section style="padding: 0 0 4rem;">
+    <div class="container" style="max-width: 800px;">
+        <div class="card" style="padding: 2.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 1.5rem;">
+                <div
+                    style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 12px; background: #e8f5e9; flex-shrink: 0;">
+                    <i data-lucide="milestone" style="width: 22px; height: 22px; color: #2e7d32;"></i>
+                </div>
+                <h2 style="margin: 0; font-size: 1.5rem;">Tenancy Stages</h2>
+            </div>
+
+            <div style="background: var(--gray-50); border-radius: 12px; padding: 1.5rem;">
+                <ul style="color: var(--gray-600); line-height: 1.9; padding-left: 1.25rem; margin: 0;">
+                    <li><strong>Application:</strong> the tenant applies for a property through the marketplace.</li>
+                    <li><strong>Review:</strong> the landlord reviews the application and makes a decision.</li>
+                    <li><strong>Active Tenancy:</strong> once approved, the tenancy is live with agreed rent, start
+                        date, and terms.</li>
+                    <li><strong>Termination Request:</strong> either party can initiate a termination request with a
+                        reason.</li>
+                    <li><strong>Mutual Termination:</strong> the other party confirms, and the tenancy ends formally.
+                    </li>
+                    <li><strong>History:</strong> completed tenancies remain on record for both parties' reference.</li>
+                </ul>
+            </div>
+
+            <div style="background: var(--gray-50); border-radius: 12px; padding: 1.5rem; margin-top: 1.25rem;">
+                <h3 style="font-size: 1.1rem; margin-bottom: 0.75rem; color: var(--gray-800);">
+                    <i data-lucide="shield" class="icon-sm" style="vertical-align: middle; color: var(--accent);"></i>
+                    Built-In Protections
+                </h3>
+                <p style="color: var(--gray-600); line-height: 1.8; margin: 0;">
+                    Terminations require <strong>mutual agreement</strong>, meaning neither party can unilaterally end a
+                    tenancy without the other's confirmation. This protects both landlords and tenants from unexpected
+                    disruptions and ensures a fair process.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

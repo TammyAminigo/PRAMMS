@@ -122,7 +122,7 @@
                             </div>
                             <div class="filter-item">
                                 <label class="filter-label">Result</label>
-                                <div class="land-result" id="homeResult">—</div>
+                                <div class="land-result" id="homeResult"> -</div>
                             </div>
                         </div>
                         <p class="land-converter-note" id="homeMessage" style="display: none;"></p>
@@ -144,64 +144,115 @@
 
         <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
             <!-- Feature 1 -->
-            <div class="card" style="text-align: center; padding: 2rem;">
-                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                    <i data-lucide="home" class="icon-2xl icon-accent"></i>
+            <a href="{% url 'feature_marketplace' %}" style="text-decoration: none; color: inherit;">
+                <div class="card"
+                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                        <i data-lucide="home" class="icon-2xl icon-accent"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.75rem;">Open Marketplace</h3>
+                    <p style="color: var(--gray-500);">Browse available properties publicly. No account needed to
+                        discover
+                        your next home.</p>
+                    <span
+                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
+                        More →</span>
                 </div>
-                <h3 style="margin-bottom: 0.75rem;">Open Marketplace</h3>
-                <p style="color: var(--gray-500);">Browse available properties publicly. No account needed to discover
-                    your next home.</p>
-            </div>
+            </a>
 
             <!-- Feature 2 -->
-            <div class="card" style="text-align: center; padding: 2rem;">
-                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                    <i data-lucide="handshake" class="icon-2xl icon-accent"></i>
+            <a href="{% url 'feature_connections' %}" style="text-decoration: none; color: inherit;">
+                <div class="card"
+                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                        <i data-lucide="handshake" class="icon-2xl icon-accent"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.75rem;">Transparent Connections</h3>
+                    <p style="color: var(--gray-500);">Apply for properties directly. Landlords review applications and
+                        confirm tenancies.</p>
+                    <span
+                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
+                        More →</span>
                 </div>
-                <h3 style="margin-bottom: 0.75rem;">Transparent Connections</h3>
-                <p style="color: var(--gray-500);">Apply for properties directly. Landlords review applications and
-                    confirm tenancies.</p>
-            </div>
+            </a>
 
             <!-- Feature 3 -->
-            <div class="card" style="text-align: center; padding: 2rem;">
-                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                    <i data-lucide="refresh-cw" class="icon-2xl icon-accent"></i>
+            <a href="{% url 'feature_lifecycle' %}" style="text-decoration: none; color: inherit;">
+                <div class="card"
+                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                        <i data-lucide="refresh-cw" class="icon-2xl icon-accent"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.75rem;">Lifecycle Management</h3>
+                    <p style="color: var(--gray-500);">Full tenancy lifecycle, from application to lease to mutual
+                        termination. Everything tracked.</p>
+                    <span
+                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
+                        More →</span>
                 </div>
-                <h3 style="margin-bottom: 0.75rem;">Lifecycle Management</h3>
-                <p style="color: var(--gray-500);">Full tenancy lifecycle, from application to lease to mutual
-                    termination. Everything tracked.</p>
-            </div>
+            </a>
 
             <!-- Feature 4 -->
-            <div class="card" style="text-align: center; padding: 2rem;">
-                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                    <i data-lucide="wrench" class="icon-2xl icon-accent"></i>
+            <a href="{% url 'feature_maintenance' %}" style="text-decoration: none; color: inherit;">
+                <div class="card"
+                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                        <i data-lucide="wrench" class="icon-2xl icon-accent"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.75rem;">Maintenance Requests</h3>
+                    <p style="color: var(--gray-500);">Submit, track, and resolve maintenance issues seamlessly during
+                        your
+                        tenancy.</p>
+                    <span
+                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
+                        More →</span>
                 </div>
-                <h3 style="margin-bottom: 0.75rem;">Maintenance Requests</h3>
-                <p style="color: var(--gray-500);">Submit, track, and resolve maintenance issues seamlessly during your
-                    tenancy.</p>
-            </div>
+            </a>
 
             <!-- Feature 5 -->
-            <div class="card" style="text-align: center; padding: 2rem;">
-                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                    <i data-lucide="bar-chart-3" class="icon-2xl icon-accent"></i>
+            <a href="{% url 'feature_analytics' %}" style="text-decoration: none; color: inherit;">
+                <div class="card"
+                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                        <i data-lucide="bar-chart-3" class="icon-2xl icon-accent"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.75rem;">Property Analytics</h3>
+                    <p style="color: var(--gray-500);">Landlords get clear insights: vacancy tracking, rent monitoring,
+                        and
+                        tenancy history.</p>
+                    <span
+                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
+                        More →</span>
                 </div>
-                <h3 style="margin-bottom: 0.75rem;">Property Analytics</h3>
-                <p style="color: var(--gray-500);">Landlords get clear insights: vacancy tracking, rent monitoring, and
-                    tenancy history.</p>
-            </div>
+            </a>
 
             <!-- Feature 6 -->
-            <div class="card" style="text-align: center; padding: 2rem;">
-                <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                    <i data-lucide="landmark" class="icon-2xl icon-accent"></i>
+            <a href="{% url 'mortgage_info' %}" style="text-decoration: none; color: inherit;">
+                <div class="card"
+                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
+                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
+                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
+                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
+                        <i data-lucide="landmark" class="icon-2xl icon-accent"></i>
+                    </div>
+                    <h3 style="margin-bottom: 0.75rem;">Access to Mortgage Plans</h3>
+                    <p style="color: var(--gray-500);">Explore mortgage options and financing plans to help you own your
+                        dream property.</p>
+                    <span
+                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
+                        More →</span>
                 </div>
-                <h3 style="margin-bottom: 0.75rem;">Access to Mortgage Plans</h3>
-                <p style="color: var(--gray-500);">Explore mortgage options and financing plans to help you own your
-                    dream property.</p>
-            </div>
+            </a>
         </div>
     </div>
 </section>
@@ -269,7 +320,7 @@
                 const messageEl = document.getElementById('homeMessage');
 
                 messageEl.style.display = 'none';
-                resultEl.textContent = '—';
+                resultEl.textContent = ' -';
 
                 const dimMatch = rawValue.match(/^(\d+(?:\.\d+)?)\s*[xX×]\s*(\d+(?:\.\d+)?)$/);
                 let value = dimMatch ? parseFloat(dimMatch[1]) * parseFloat(dimMatch[2]) : parseFloat(rawValue);

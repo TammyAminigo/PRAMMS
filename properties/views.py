@@ -216,3 +216,35 @@ def property_delete(request, pk):
     })
 
 
+# ----- MORTGAGE INFORMATION (PUBLIC) -----
+
+def mortgage_info(request):
+    """Public page explaining mortgages and linking to FMBN."""
+    return render(request, 'properties/mortgage_info.html')
+
+
+# ----- FEATURE INFO PAGES (PUBLIC) -----
+
+def feature_marketplace(request):
+    """Public page explaining the open marketplace feature."""
+    return render(request, 'properties/feature_marketplace.html')
+
+
+def feature_connections(request):
+    """Public page explaining transparent connections feature."""
+    return render(request, 'properties/feature_connections.html')
+
+
+def feature_lifecycle(request):
+    """Public page explaining lifecycle management feature."""
+    return render(request, 'properties/feature_lifecycle.html')
+
+
+def feature_maintenance(request):
+    """Public page explaining maintenance requests feature."""
+    return render(request, 'properties/feature_maintenance.html')
+
+
+def feature_analytics(request):
+    """Public page explaining property analytics feature."""
+    return render(request, 'properties/feature_analytics.html')
