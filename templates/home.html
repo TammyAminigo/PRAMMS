@@ -34,7 +34,7 @@
                 <div class="search-bar-row">
                     <div class="search-input-wrap">
                         <i data-lucide="search" class="search-icon"></i>
-                        <input type="text" name="q" placeholder="Search properties for sale... using Location"
+                        <input type="text" name="q" placeholder="Search properties for sale using location"
                             class="search-main-input" id="heroSearchInput">
                     </div>
                     <button type="submit" class="btn btn-primary search-submit-btn">
@@ -217,12 +217,12 @@
         if (listing === 'land') {
             propertyFilters.style.display = 'none';
             landFilters.style.display = 'block';
-            searchInput.placeholder = 'Search land listings... using Location';
+            searchInput.placeholder = 'Search land for sale using location';
         } else {
             propertyFilters.style.display = 'flex';
             landFilters.style.display = 'none';
-            const labels = { sale: 'properties for sale', rent: 'properties for rent', shortlet: 'short let properties' };
-            searchInput.placeholder = 'Search ' + (labels[listing] || 'properties') + '...';
+            const labels = { sale: 'properties for sale', rent: 'properties for rent', shortlet: 'shortlet properties' };
+            searchInput.placeholder = 'Search ' + (labels[listing] || 'properties') + ' using location';
         }
     }
 
