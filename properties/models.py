@@ -105,6 +105,8 @@ class Property(models.Model):
     )
     is_occupied = models.BooleanField(default=False)
     is_available = models.BooleanField(default=True, help_text="Visible on public marketplace")
+    shortlet_start = models.DateField(null=True, blank=True, help_text="Check-in date for shortlet listings")
+    shortlet_end = models.DateField(null=True, blank=True, help_text="Check-out date for shortlet listings")
     photo = models.ImageField(upload_to='properties/', blank=True, null=True, help_text="Property photo")
     bedrooms = models.PositiveIntegerField(null=True, blank=True, help_text="Number of bedrooms")
     created_at = models.DateTimeField(auto_now_add=True)
@@ -207,3 +209,23 @@ class InvitationLink(models.Model):
         if request:
             return request.build_absolute_uri(path)
         return path
+
+
+class PropertyImage(models.Model):
+    """Additional photos for a property (up to 5)."""
+    property = models.ForeignKey(
+        Property,
+        on_delete=models.CASCADE,
+        related_name='additional_images'
+    )
+    image = models.ImageField(upload_to='properties/gallery/')
+    caption = models.CharField(max_length=200, blank=True)
+    order = models.PositiveIntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'property_images'
+        ordering = ['order', 'created_at']
+
+    def __str__(self):
+        return f"Image for {self.property.name} (#{self.order})"

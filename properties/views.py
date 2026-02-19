@@ -5,7 +5,7 @@ from django.utils import timezone
 from django.db.models import Q
 from datetime import timedelta
 
-from .models import Property
+from .models import Property, PropertyImage
 from .forms import PropertyForm
 
 
@@ -18,11 +18,17 @@ def marketplace_list(request):
     # Search
     query = request.GET.get('q', '')
     if query:
-        properties = properties.filter(
+        # Search by name, address, description, and state
+        from properties.models import Property as P
+        state_matches = [key for key, label in P.NIGERIAN_STATE_CHOICES if query.lower() in label.lower()]
+        q_filter = (
             Q(name__icontains=query) |
             Q(address__icontains=query) |
             Q(description__icontains=query)
         )
+        if state_matches:
+            q_filter = q_filter | Q(state__in=state_matches)
+        properties = properties.filter(q_filter)
     
     # Filter by listing type
     listing_type = request.GET.get('listing_type', '')
@@ -85,6 +91,7 @@ def marketplace_list(request):
 def marketplace_detail(request, pk):
     """Public property detail page with 'Apply' CTA."""
     property_obj = get_object_or_404(Property, pk=pk, is_available=True)
+    additional_images = property_obj.additional_images.all()
     
     # Check if current user has already applied
     has_applied = False
@@ -99,6 +106,7 @@ def marketplace_detail(request, pk):
     context = {
         'property': property_obj,
         'has_applied': has_applied,
+        'additional_images': additional_images,
     }
     return render(request, 'properties/marketplace_detail.html', context)
 
@@ -129,6 +137,14 @@ def property_add(request):
             property_obj = form.save(commit=False)
             property_obj.landlord = request.user
             property_obj.save()
+            # Handle additional photos
+            additional_files = request.FILES.getlist('additional_photos')
+            for i, photo in enumerate(additional_files[:5]):
+                PropertyImage.objects.create(
+                    property=property_obj,
+                    image=photo,
+                    order=i
+                )
             messages.success(request, f'Property "{property_obj.name}" added and listed on the marketplace!')
             return redirect('property_list')
     else:
@@ -184,15 +200,28 @@ def property_edit(request, pk):
         form = PropertyForm(request.POST, request.FILES, instance=property_obj)
         if form.is_valid():
             form.save()
+            # Handle additional photos
+            additional_files = request.FILES.getlist('additional_photos')
+            if additional_files:
+                existing_count = property_obj.additional_images.count()
+                slots = 5 - existing_count
+                for i, photo in enumerate(additional_files[:slots]):
+                    PropertyImage.objects.create(
+                        property=property_obj,
+                        image=photo,
+                        order=existing_count + i
+                    )
             messages.success(request, 'Property updated successfully!')
             return redirect('property_detail', pk=pk)
     else:
         form = PropertyForm(instance=property_obj)
     
+    existing_images = property_obj.additional_images.all()
     return render(request, 'properties/property_form.html', {
         'form': form,
         'title': 'Edit Property',
-        'property': property_obj
+        'property': property_obj,
+        'existing_images': existing_images,
     })
 
 

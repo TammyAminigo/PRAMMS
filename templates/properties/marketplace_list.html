@@ -47,7 +47,7 @@
             <div class="search-bar-row">
                 <div class="search-input-wrap">
                     <i data-lucide="search" class="search-icon"></i>
-                    <input type="text" name="q" value="{{ query }}" placeholder="Search properties..."
+                    <input type="text" name="q" value="{{ query }}" placeholder="Search properties... using Location"
                         class="search-main-input" id="searchInput">
                 </div>
                 <button type="submit" class="btn btn-primary search-submit-btn">
@@ -208,7 +208,7 @@
                 </div>
                 <div class="property-card-body">
                     <h4>{{ property.name }}</h4>
-                    <p class="address"><i data-lucide="map-pin" class="icon-xs" style="vertical-align: middle;"></i> {{ property.address }}</p>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs" style="vertical-align: middle;"></i> {{ property.address }} &middot; {{ property.get_state_display }}</p>
                     {% if property.description %}
                     <p
                         style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
@@ -270,7 +270,7 @@
                 </div>
                 <div class="property-card-body">
                     <h4>{{ property.name }}</h4>
-                    <p class="address"><i data-lucide="map-pin" class="icon-xs" style="vertical-align: middle;"></i> {{ property.address }}</p>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs" style="vertical-align: middle;"></i> {{ property.address }} &middot; {{ property.get_state_display }}</p>
                     {% if property.description %}
                     <p
                         style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 0.75rem; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">
@@ -330,12 +330,12 @@
                 if (listing === 'land') {
                     propertyFilters.style.display = 'none';
                     landFilters.style.display = 'block';
-                    searchInput.placeholder = 'Search land listings...';
+                    searchInput.placeholder = 'Search land listings... using Location';
                 } else {
                     propertyFilters.style.display = 'flex';
                     landFilters.style.display = 'none';
                     const labels = { sale: 'properties for sale', rent: 'properties for rent', shortlet: 'short let properties' };
-                    searchInput.placeholder = 'Search ' + (labels[listing] || 'properties') + '...';
+                    searchInput.placeholder = 'Search ' + (labels[listing] || 'properties') + '... using Location';
                 }
 
                 // Update listing type and filters without auto-submitting
@@ -349,12 +349,12 @@
         if (currentListing === 'land') {
             propertyFilters.style.display = 'none';
             landFilters.style.display = 'block';
-            searchInput.placeholder = 'Search land listings...';
+            searchInput.placeholder = 'Search land listings... using Location';
         } else {
             propertyFilters.style.display = 'flex';
             landFilters.style.display = 'none';
             const labels = { sale: 'properties for sale', rent: 'properties for rent', shortlet: 'short let properties' };
-            searchInput.placeholder = 'Search ' + (labels[currentListing] || 'properties') + '...';
+            searchInput.placeholder = 'Search ' + (labels[currentListing] || 'properties') + '... using Location';
         }
 
         // Land Converter

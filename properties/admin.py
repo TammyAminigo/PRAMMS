@@ -1,13 +1,20 @@
 from django.contrib import admin
-from .models import Property, TenantProfile, InvitationLink
+from .models import Property, TenantProfile, InvitationLink, PropertyImage
 from prmms.admin_site import propz_admin_site
 
 
+class PropertyImageInline(admin.TabularInline):
+    model = PropertyImage
+    extra = 1
+    max_num = 5
+
+
 class PropertyAdmin(admin.ModelAdmin):
-    list_display = ['name', 'landlord', 'address', 'rent_amount', 'is_occupied', 'created_at']
-    list_filter = ['is_occupied', 'created_at']
+    list_display = ['name', 'landlord', 'address', 'state', 'rent_amount', 'is_occupied', 'created_at']
+    list_filter = ['is_occupied', 'state', 'listing_type', 'created_at']
     search_fields = ['name', 'address', 'landlord__username']
     ordering = ['-created_at']
+    inlines = [PropertyImageInline]
 
 
 class TenantProfileAdmin(admin.ModelAdmin):
