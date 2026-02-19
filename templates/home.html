@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load humanize %}
 
 {% block title %}Propz - Find Your Next Property{% endblock %}
 
@@ -133,129 +134,49 @@
     </div>
 </section>
 
-<!-- Features Section -->
-<section class="features" style="padding: 5rem 0;">
+<!-- Suggested Properties Section -->
+{% if suggested_properties %}
+<section style="padding: 4rem 0; background: var(--gray-50);">
     <div class="container">
-        <div style="text-align: center; margin-bottom: 3rem;">
-            <h2>How Propz Works</h2>
-            <p style="color: var(--gray-500); max-width: 600px; margin: 0.75rem auto 0;">A transparent property
-                management ecosystem connecting landlords and tenants.</p>
+        <div style="text-align: center; margin-bottom: 2.5rem;">
+            <h2 style="margin-bottom: 0.5rem;">Featured Properties</h2>
+            <p style="color: var(--gray-500); max-width: 600px; margin: 0 auto;">Explore some of the latest properties available on Propz.</p>
         </div>
-
-        <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
-            <!-- Feature 1 -->
-            <a href="{% url 'feature_marketplace' %}" style="text-decoration: none; color: inherit;">
-                <div class="card"
-                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
-                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                        <i data-lucide="home" class="icon-2xl icon-accent"></i>
+        <div class="property-grid">
+            {% for property in suggested_properties %}
+            <a href="{% url 'marketplace_detail' pk=property.pk %}" class="property-card" style="text-decoration: none; color: inherit;">
+                <div class="property-card-image" {% if property.photo %}style="background: none;"{% endif %}>
+                    {% if property.photo %}
+                    <img src="{{ property.photo.url }}" alt="{{ property.name }}" style="width:100%;height:100%;object-fit:cover;border-radius:12px 12px 0 0;">
+                    {% else %}
+                    <i data-lucide="house" class="icon-2xl" style="color: rgba(255,255,255,0.7);"></i>
+                    {% endif %}
+                    <div style="position: absolute; top: 12px; left: 12px; display: flex; gap: 6px;">
+                        <span class="badge badge-success" style="background: var(--accent); color: white;">{{ property.get_listing_type_display }}</span>
+                        <span class="badge badge-info">{{ property.get_property_type_display }}</span>
                     </div>
-                    <h3 style="margin-bottom: 0.75rem;">Open Marketplace</h3>
-                    <p style="color: var(--gray-500);">Browse available properties publicly. No account needed to
-                        discover
-                        your next home.</p>
-                    <span
-                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
-                        More →</span>
+                </div>
+                <div class="property-card-body">
+                    <h4>{{ property.name }}</h4>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs" style="vertical-align: middle;"></i> {{ property.address }}</p>
+                    <div class="rent">&#8358;{{ property.rent_amount|floatformat:"0"|intcomma }}
+                        {% if property.get_rent_period_display %}<span>/ {{ property.get_rent_period_display }}</span>{% endif %}
+                    </div>
+                    {% if property.bedrooms %}
+                    <div style="margin-top: 0.5rem; color: var(--gray-500); font-size: 0.85rem;">
+                        <i data-lucide="bed-double" class="icon-xs" style="vertical-align: middle;"></i> {{ property.bedrooms }} Bedroom{{ property.bedrooms|pluralize }}
+                    </div>
+                    {% endif %}
                 </div>
             </a>
-
-            <!-- Feature 2 -->
-            <a href="{% url 'feature_connections' %}" style="text-decoration: none; color: inherit;">
-                <div class="card"
-                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
-                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                        <i data-lucide="handshake" class="icon-2xl icon-accent"></i>
-                    </div>
-                    <h3 style="margin-bottom: 0.75rem;">Transparent Connections</h3>
-                    <p style="color: var(--gray-500);">Apply for properties directly. Landlords review applications and
-                        confirm tenancies.</p>
-                    <span
-                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
-                        More →</span>
-                </div>
-            </a>
-
-            <!-- Feature 3 -->
-            <a href="{% url 'feature_lifecycle' %}" style="text-decoration: none; color: inherit;">
-                <div class="card"
-                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
-                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                        <i data-lucide="refresh-cw" class="icon-2xl icon-accent"></i>
-                    </div>
-                    <h3 style="margin-bottom: 0.75rem;">Lifecycle Management</h3>
-                    <p style="color: var(--gray-500);">Full tenancy lifecycle, from application to lease to mutual
-                        termination. Everything tracked.</p>
-                    <span
-                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
-                        More →</span>
-                </div>
-            </a>
-
-            <!-- Feature 4 -->
-            <a href="{% url 'feature_maintenance' %}" style="text-decoration: none; color: inherit;">
-                <div class="card"
-                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
-                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                        <i data-lucide="wrench" class="icon-2xl icon-accent"></i>
-                    </div>
-                    <h3 style="margin-bottom: 0.75rem;">Maintenance Requests</h3>
-                    <p style="color: var(--gray-500);">Submit, track, and resolve maintenance issues seamlessly during
-                        your
-                        tenancy.</p>
-                    <span
-                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
-                        More →</span>
-                </div>
-            </a>
-
-            <!-- Feature 5 -->
-            <a href="{% url 'feature_analytics' %}" style="text-decoration: none; color: inherit;">
-                <div class="card"
-                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
-                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                        <i data-lucide="bar-chart-3" class="icon-2xl icon-accent"></i>
-                    </div>
-                    <h3 style="margin-bottom: 0.75rem;">Property Analytics</h3>
-                    <p style="color: var(--gray-500);">Landlords get clear insights: vacancy tracking, rent monitoring,
-                        and
-                        tenancy history.</p>
-                    <span
-                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
-                        More →</span>
-                </div>
-            </a>
-
-            <!-- Feature 6 -->
-            <a href="{% url 'mortgage_info' %}" style="text-decoration: none; color: inherit;">
-                <div class="card"
-                    style="text-align: center; padding: 2rem; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease;"
-                    onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';"
-                    onmouseout="this.style.transform=''; this.style.boxShadow='';">
-                    <div style="margin-bottom: 1rem; display: flex; justify-content: center;">
-                        <i data-lucide="landmark" class="icon-2xl icon-accent"></i>
-                    </div>
-                    <h3 style="margin-bottom: 0.75rem;">Access to Mortgage Plans</h3>
-                    <p style="color: var(--gray-500);">Explore mortgage options and financing plans to help you own your
-                        dream property.</p>
-                    <span
-                        style="display: inline-block; margin-top: 1rem; color: var(--primary); font-weight: 600; font-size: 0.9rem;">Learn
-                        More →</span>
-                </div>
-            </a>
+            {% endfor %}
+        </div>
+        <div style="text-align: center; margin-top: 2rem;">
+            <a href="{% url 'marketplace_list' %}" class="btn btn-primary btn-lg">View All Properties</a>
         </div>
     </div>
 </section>
+{% endif %}
 
 <!-- CTA Section -->
 <section

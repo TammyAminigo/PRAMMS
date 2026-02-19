@@ -338,11 +338,9 @@
                     searchInput.placeholder = 'Search ' + (labels[listing] || 'properties') + '...';
                 }
 
-                // Auto-submit when switching tabs - clear filter values first
-                form.querySelectorAll('.filter-select, .filter-input').forEach(el => {
-                    if (el.name) el.value = '';
-                });
-                form.submit();
+                // Update listing type and filters without auto-submitting
+                // User must press the Search button to trigger a search
+
             });
         });
 

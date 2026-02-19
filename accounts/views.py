@@ -18,6 +18,14 @@ class HomeView(TemplateView):
         if request.user.is_authenticated:
             return redirect('dashboard')
         return super().get(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        from properties.models import Property
+        context['suggested_properties'] = Property.objects.filter(
+            is_available=True
+        ).order_by('-created_at')[:6]
+        return context
 
 
 # =============================================
