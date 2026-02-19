@@ -178,10 +178,14 @@ def tenancy_detail(request, pk):
         messages.error(request, 'Access denied.')
         return redirect('dashboard')
     
+    from properties.models import PropertyImage
+    additional_images = PropertyImage.objects.filter(property=tenancy.rental_property).order_by('order')
+
     return render(request, 'tenancy/tenancy_detail.html', {
         'tenancy': tenancy,
         'is_landlord': is_landlord,
         'is_tenant': is_tenant,
+        'additional_images': additional_images,
     })
 
 

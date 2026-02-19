@@ -179,10 +179,13 @@ def property_detail(request, pk):
         status='pending'
     ).select_related('tenant')
     
+    additional_images = PropertyImage.objects.filter(property=property_obj).order_by('order')
+
     context = {
         'property': property_obj,
         'active_tenancy': active_tenancy,
         'pending_applications': pending_applications,
+        'additional_images': additional_images,
     }
     return render(request, 'properties/property_detail.html', context)
 

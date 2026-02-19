@@ -34,11 +34,40 @@
 
         <div class="property-detail-grid">
             <div class="property-detail-main">
+                <!-- Property Photo Gallery -->
+                {% if tenancy.rental_property.photo %}
+                <div style="margin-bottom: 1.5rem;">
+                    <div id="photoContainer" style="position: relative; background: #f0f2f5; border-radius: 12px; overflow: hidden; display: flex; align-items: center; justify-content: center; min-height: 250px; max-height: 420px;">
+                        <img id="mainPhoto" src="{{ tenancy.rental_property.photo.url }}" alt="{{ tenancy.rental_property.name }}" style="display: block; max-width: 100%; max-height: 420px; width: auto; height: auto; object-fit: contain; margin: 0 auto;">
+                        <!-- Nav Arrows (always show for future photos) -->
+                        <button onclick="galleryPrev()" style="position: absolute; top: 50%; left: 12px; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 2;">
+                            <i data-lucide="chevron-left" style="width: 20px; height: 20px;"></i>
+                        </button>
+                        <button onclick="galleryNext()" style="position: absolute; top: 50%; right: 12px; transform: translateY(-50%); width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15); z-index: 2;">
+                            <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
+                        </button>
+                        <!-- Photo Counter -->
+                        <div style="position: absolute; bottom: 12px; right: 12px; background: rgba(255,255,255,0.9); padding: 4px 10px; border-radius: 6px; font-size: 0.8rem; font-weight: 600; display: flex; align-items: center; gap: 4px; z-index: 2;">
+                            <i data-lucide="image" style="width: 14px; height: 14px;"></i>
+                            <span id="photoCounter">1/{% if additional_images %}{{ additional_images.count|add:1 }}{% else %}1{% endif %}</span>
+                        </div>
+                    </div>
+                    {% if additional_images %}
+                    <div style="display: flex; gap: 8px; padding: 10px 0; overflow-x: auto;">
+                        <img src="{{ tenancy.rental_property.photo.url }}" alt="Main" onclick="selectPhoto(this, 0)" style="width: 72px; height: 54px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid var(--accent); opacity: 1; flex-shrink: 0;" class="gallery-thumb active">
+                        {% for img in additional_images %}
+                        <img src="{{ img.image.url }}" alt="{{ img.caption|default:'Photo' }}" onclick="selectPhoto(this, {{ forloop.counter }})" style="width: 72px; height: 54px; object-fit: cover; border-radius: 8px; cursor: pointer; border: 2px solid transparent; opacity: 0.6; flex-shrink: 0;" class="gallery-thumb">
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
+
                 <!-- Property Info -->
                 <div class="card" style="margin-bottom: 1.5rem;">
                     <h3 style="margin-bottom: 1rem;">Property</h3>
                     <h4>{{ tenancy.rental_property.name }}</h4>
-                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address }}</p>
+                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address }} · {{ tenancy.rental_property.get_state_display }}</p>
                     <p style="color: var(--primary); font-weight: 700; font-size: 1.5rem;">
                         ₦{{ tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }}
                         <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-500);">/ {{ tenancy.rental_property.get_rent_period_display }}</span>
@@ -151,4 +180,47 @@
         </div>
     </div>
 </section>
+
+<script>
+    var galleryImages = [];
+    var currentIndex = 0;
+    document.addEventListener('DOMContentLoaded', function() {
+        var thumbs = document.querySelectorAll('.gallery-thumb');
+        thumbs.forEach(function(t) { galleryImages.push(t.src); });
+        if (galleryImages.length === 0) {
+            var mainImg = document.getElementById('mainPhoto');
+            if (mainImg) galleryImages.push(mainImg.src);
+        }
+    });
+    function selectPhoto(thumb, index) {
+        currentIndex = index;
+        document.getElementById('mainPhoto').src = thumb.src;
+        document.querySelectorAll('.gallery-thumb').forEach(function(t) { t.classList.remove('active'); t.style.opacity = '0.6'; t.style.borderColor = 'transparent'; });
+        thumb.classList.add('active'); thumb.style.opacity = '1'; thumb.style.borderColor = 'var(--accent)';
+        updateCounter();
+    }
+    function galleryPrev() {
+        if (galleryImages.length <= 1) return;
+        currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+        document.getElementById('mainPhoto').src = galleryImages[currentIndex];
+        updateThumbs(); updateCounter();
+    }
+    function galleryNext() {
+        if (galleryImages.length <= 1) return;
+        currentIndex = (currentIndex + 1) % galleryImages.length;
+        document.getElementById('mainPhoto').src = galleryImages[currentIndex];
+        updateThumbs(); updateCounter();
+    }
+    function updateThumbs() {
+        document.querySelectorAll('.gallery-thumb').forEach(function(t, i) {
+            t.classList.toggle('active', i === currentIndex);
+            t.style.opacity = i === currentIndex ? '1' : '0.6';
+            t.style.borderColor = i === currentIndex ? 'var(--accent)' : 'transparent';
+        });
+    }
+    function updateCounter() {
+        var c = document.getElementById('photoCounter');
+        if (c) c.textContent = (currentIndex + 1) + '/' + galleryImages.length;
+    }
+</script>
 {% endblock %}
