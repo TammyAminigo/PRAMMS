@@ -185,8 +185,8 @@ def landlord_dashboard(request):
     
     properties = Property.objects.filter(landlord=user)
     properties_count = properties.count()
-    occupied_count = properties.filter(is_available=False).count()
-    vacant_count = properties.filter(is_available=True).count()
+    occupied_count = properties.filter(is_occupied=True).count()
+    vacant_count = properties.filter(is_occupied=False).count()
     
     # Pending maintenance requests
     pending_requests = MaintenanceRequest.objects.filter(
