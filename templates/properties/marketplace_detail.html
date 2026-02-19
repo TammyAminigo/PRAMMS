@@ -11,39 +11,60 @@
             <a href="{% url 'marketplace_list' %}" style="color: var(--accent); font-weight: 500;">← Back to Marketplace</a>
         </div>
 
+        <!-- Property Title -->
+        <h1 style="margin-bottom: 1rem; font-size: 1.75rem; font-weight: 700;">{{ property.name }}</h1>
+
         <div class="property-detail-grid">
             <!-- Main Content -->
             <div class="property-detail-main">
 
                 <!-- Photo Gallery -->
                 {% if property.photo or additional_images %}
-                <div class="card" style="margin-bottom: 1.5rem; padding: 0; overflow: hidden;">
-                    {% if property.photo %}
-                    <div style="position: relative; width: 100%; max-height: 420px; overflow: hidden;">
-                        <img src="{{ property.photo.url }}" alt="{{ property.name }}" id="mainPhoto" style="width: 100%; height: 420px; object-fit: cover; display: block; border-radius: 12px 12px 0 0;">
-                    </div>
-                    {% endif %}
-                    {% if additional_images %}
-                    <div style="display: flex; gap: 6px; padding: 10px; overflow-x: auto; background: var(--gray-50);">
+                <div class="photo-gallery-wrapper">
+                    <div class="photo-gallery-main">
                         {% if property.photo %}
-                        <img src="{{ property.photo.url }}" alt="Main" onclick="document.getElementById('mainPhoto').src=this.src" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid var(--accent); flex-shrink: 0;">
+                        <img src="{{ property.photo.url }}" alt="{{ property.name }}" id="mainPhoto" class="gallery-main-img">
+                        {% endif %}
+                        
+                        {% if additional_images %}
+                        <!-- Nav Arrows -->
+                        <button class="gallery-nav gallery-nav-prev" onclick="galleryPrev()" id="galleryPrev">
+                            <i data-lucide="chevron-left" style="width: 20px; height: 20px;"></i>
+                        </button>
+                        <button class="gallery-nav gallery-nav-next" onclick="galleryNext()" id="galleryNext">
+                            <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
+                        </button>
+                        {% endif %}
+                        
+                        <!-- Photo Counter -->
+                        {% if additional_images %}
+                        <div class="gallery-counter">
+                            <i data-lucide="image" style="width: 14px; height: 14px;"></i>
+                            <span id="photoCounter">1/{{ additional_images.count|add:1 }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    
+                    {% if additional_images %}
+                    <div class="gallery-thumbnails">
+                        {% if property.photo %}
+                        <img src="{{ property.photo.url }}" alt="Main" class="gallery-thumb active" onclick="selectPhoto(this, 0)">
                         {% endif %}
                         {% for img in additional_images %}
-                        <img src="{{ img.image.url }}" alt="{{ img.caption|default:'Photo' }}" onclick="document.getElementById('mainPhoto').src=this.src" style="width: 80px; height: 60px; object-fit: cover; border-radius: 6px; cursor: pointer; border: 2px solid transparent; flex-shrink: 0;" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='transparent'">
+                        <img src="{{ img.image.url }}" alt="{{ img.caption|default:'Photo' }}" class="gallery-thumb" onclick="selectPhoto(this, {{ forloop.counter }})">
                         {% endfor %}
                     </div>
                     {% endif %}
                 </div>
                 {% endif %}
 
-                <!-- Property Header -->
+                <!-- Property Info Card -->
                 <div class="card" style="margin-bottom: 1.5rem;">
                     <div style="display: flex; gap: 8px; margin-bottom: 1rem; flex-wrap: wrap;">
                         <span class="badge badge-success" style="background: var(--accent); color: white;">{{ property.get_listing_type_display }}</span>
                         <span class="badge badge-info">{{ property.get_property_type_display }}</span>
                         <span class="badge badge-success">Available</span>
                     </div>
-                    <h1 style="margin-bottom: 0.5rem;">{{ property.name }}</h1>
                     <p style="color: var(--gray-500); font-size: 1rem; margin-bottom: 1.5rem;"><i data-lucide="map-pin" class="icon-xs"></i> {{ property.address }}{% if property.unit_number %} · Unit {{ property.unit_number }}{% endif %} · {{ property.get_state_display }}</p>
 
                     <div class="rent" style="font-size: 2rem; font-weight: 700; color: var(--primary); margin-bottom: 1.5rem;">
@@ -129,7 +150,6 @@
                         </div>
                     </div>
 
-                    <!-- Contact Info -->
                     {% if property.landlord.phone %}
                     <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--gray-200);">
                         <p style="font-size: 0.85rem; color: var(--gray-500); margin-bottom: 0.5rem;">
@@ -143,7 +163,6 @@
                     </div>
                     {% endif %}
 
-                    <!-- WhatsApp & Telegram -->
                     {% if property.landlord.whatsapp_number or property.landlord.telegram_username %}
                     <div style="display: flex; flex-direction: column; gap: 0.5rem; margin-top: 1rem;">
                         {% if property.landlord.whatsapp_number %}
@@ -191,4 +210,157 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .photo-gallery-wrapper {
+        margin-bottom: 1.5rem;
+    }
+
+    .photo-gallery-main {
+        position: relative;
+        background: #f0f2f5;
+        border-radius: 12px;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 300px;
+        max-height: 480px;
+    }
+
+    .gallery-main-img {
+        display: block;
+        max-width: 100%;
+        max-height: 480px;
+        width: auto;
+        height: auto;
+        object-fit: contain;
+        margin: 0 auto;
+    }
+
+    .gallery-nav {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.9);
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+        transition: background 0.2s;
+        z-index: 2;
+    }
+
+    .gallery-nav:hover {
+        background: white;
+    }
+
+    .gallery-nav-prev { left: 12px; }
+    .gallery-nav-next { right: 12px; }
+
+    .gallery-counter {
+        position: absolute;
+        bottom: 12px;
+        right: 12px;
+        background: rgba(255,255,255,0.9);
+        padding: 4px 10px;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        z-index: 2;
+    }
+
+    .gallery-thumbnails {
+        display: flex;
+        gap: 8px;
+        padding: 10px 0;
+        overflow-x: auto;
+    }
+
+    .gallery-thumb {
+        width: 72px;
+        height: 54px;
+        object-fit: cover;
+        border-radius: 8px;
+        cursor: pointer;
+        border: 2px solid transparent;
+        opacity: 0.6;
+        transition: all 0.2s;
+        flex-shrink: 0;
+    }
+
+    .gallery-thumb:hover,
+    .gallery-thumb.active {
+        opacity: 1;
+        border-color: var(--accent);
+    }
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    var galleryImages = [];
+    var currentIndex = 0;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        var thumbs = document.querySelectorAll('.gallery-thumb');
+        thumbs.forEach(function(t) {
+            galleryImages.push(t.src);
+        });
+        if (galleryImages.length === 0) {
+            var mainImg = document.getElementById('mainPhoto');
+            if (mainImg) galleryImages.push(mainImg.src);
+        }
+    });
+
+    function selectPhoto(thumb, index) {
+        currentIndex = index;
+        document.getElementById('mainPhoto').src = thumb.src;
+        document.querySelectorAll('.gallery-thumb').forEach(function(t) {
+            t.classList.remove('active');
+        });
+        thumb.classList.add('active');
+        updateCounter();
+    }
+
+    function galleryPrev() {
+        if (galleryImages.length === 0) return;
+        currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+        document.getElementById('mainPhoto').src = galleryImages[currentIndex];
+        updateThumbs();
+        updateCounter();
+    }
+
+    function galleryNext() {
+        if (galleryImages.length === 0) return;
+        currentIndex = (currentIndex + 1) % galleryImages.length;
+        document.getElementById('mainPhoto').src = galleryImages[currentIndex];
+        updateThumbs();
+        updateCounter();
+    }
+
+    function updateThumbs() {
+        var thumbs = document.querySelectorAll('.gallery-thumb');
+        thumbs.forEach(function(t, i) {
+            t.classList.toggle('active', i === currentIndex);
+        });
+    }
+
+    function updateCounter() {
+        var counter = document.getElementById('photoCounter');
+        if (counter) {
+            counter.textContent = (currentIndex + 1) + '/' + galleryImages.length;
+        }
+    }
+</script>
 {% endblock %}
