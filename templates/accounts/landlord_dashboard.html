@@ -90,33 +90,30 @@
                 <h2 class="section-title" style="margin-bottom: 0;"><i data-lucide="key-round" class="icon-md"></i> Active Tenancies</h2>
                 <a href="{% url 'active_tenancies' %}" class="btn btn-outline btn-sm">View All</a>
             </div>
-            <div class="property-grid">
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem;">
                 {% for tenancy in active_tenancies|slice:":3" %}
-                <a href="{% url 'tenancy_detail' pk=tenancy.pk %}" class="property-card"
-                    style="text-decoration: none; color: inherit;">
-                    <div class="property-card-image" style="height: 80px;" {% if tenancy.rental_property.photo %}style="height: 80px; background: none;"{% endif %}>
+                <a href="{% url 'tenancy_detail' pk=tenancy.pk %}" style="text-decoration: none; color: inherit;">
+                    <div style="position: relative;">
                         {% if tenancy.rental_property.photo %}
-                        <img src="{{ tenancy.rental_property.photo.url }}" alt="{{ tenancy.rental_property.name }}" style="width:100%;height:100%;object-fit:cover;border-radius:12px 12px 0 0;">
+                        <img src="{{ tenancy.rental_property.photo.url }}" alt="{{ tenancy.rental_property.name }}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; display: block;">
                         {% else %}
-                        <span class="placeholder-icon" style="font-size: 2rem;"><i data-lucide="key-round" class="icon-md"></i></span>
+                        <div style="width: 100%; aspect-ratio: 1/1; border-radius: 12px; background: linear-gradient(135deg, #e8ecf1 0%, #d1d5db 100%); display: flex; align-items: center; justify-content: center;">
+                            <i data-lucide="home" style="width: 48px; height: 48px; color: #9ca3af;"></i>
+                        </div>
                         {% endif %}
-                        <div style="position: absolute; top: 8px; right: 8px;">
+                        <div style="position: absolute; top: 10px; right: 10px;">
                             {% if tenancy.status == 'active' %}
-                            <span class="badge badge-success">Active</span>
+                            <span style="background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">Active</span>
                             {% else %}
-                            <span class="badge badge-warning">{{ tenancy.get_status_display }}</span>
+                            <span style="background: rgba(0,0,0,0.6); color: #fbbf24; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">{{ tenancy.get_status_display }}</span>
                             {% endif %}
                         </div>
                     </div>
-                    <div class="property-card-body" style="padding: 1rem;">
-                        <h4 style="font-size: 1rem;">{{ tenancy.rental_property.name }}</h4>
-                        <p style="color: var(--gray-500); font-size: 0.8rem;">Tenant: {{ tenancy.tenant.get_full_name }}
-                        </p>
+                    <div style="padding: 0.75rem 0.25rem 0;">
+                        <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 2px;">{{ tenancy.rental_property.name }}</h4>
+                        <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 2px;">Tenant: {{ tenancy.tenant.get_full_name }}</p>
                         {% if tenancy.days_remaining is not None %}
-                        <p
-                            style="font-size: 0.75rem; margin-top: 0.25rem; color: {% if tenancy.days_remaining < 30 %}var(--danger){% else %}var(--gray-500){% endif %};">
-                            {{ tenancy.days_remaining }} days remaining
-                        </p>
+                        <p style="font-size: 0.875rem; color: {% if tenancy.days_remaining < 30 %}var(--danger){% else %}var(--gray-500){% endif %};">{{ tenancy.days_remaining }} days remaining</p>
                         {% endif %}
                     </div>
                 </a>
