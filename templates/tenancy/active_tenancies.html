@@ -15,40 +15,34 @@
         </div>
 
         {% if tenancies %}
-        <div class="property-grid">
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
             {% for tenancy in tenancies %}
-            <a href="{% url 'tenancy_detail' pk=tenancy.pk %}" class="property-card"
-                style="text-decoration: none; color: inherit;">
-                <div class="property-card-image" style="height: 100px;">
-                    <span class="placeholder-icon" style="font-size: 2.5rem;"><i data-lucide="key-round"
-                            class="icon-md"></i></span>
-                    <div style="position: absolute; top: 12px; right: 12px;">
+            <a href="{% url 'tenancy_detail' pk=tenancy.pk %}" style="text-decoration: none; color: inherit;">
+                <div style="position: relative;">
+                    {% if tenancy.rental_property.photo %}
+                    <img src="{{ tenancy.rental_property.photo.url }}" alt="{{ tenancy.rental_property.name }}" style="width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 12px; display: block;">
+                    {% else %}
+                    <div style="width: 100%; aspect-ratio: 1/1; border-radius: 12px; background: linear-gradient(135deg, #e8ecf1 0%, #d1d5db 100%); display: flex; align-items: center; justify-content: center;">
+                        <i data-lucide="home" style="width: 48px; height: 48px; color: #9ca3af;"></i>
+                    </div>
+                    {% endif %}
+                    <div style="position: absolute; top: 10px; right: 10px;">
                         {% if tenancy.status == 'active' %}
-                        <span class="badge badge-success">Active</span>
+                        <span style="background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">Active</span>
                         {% elif tenancy.status == 'pending_termination' %}
-                        <span class="badge badge-warning">Pending Termination</span>
+                        <span style="background: rgba(0,0,0,0.6); color: #fbbf24; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">Pending Termination</span>
                         {% endif %}
                     </div>
                 </div>
-                <div class="property-card-body">
-                    <h4>{{ tenancy.rental_property.name }}</h4>
-                    <p class="address"><i data-lucide="map-pin" class="icon-xs"></i> {{ tenancy.rental_property.address }}</p>
-                    <p style="color: var(--gray-500); font-size: 0.875rem;">
-                        {% if user.is_landlord %}
-                        Tenant: {{ tenancy.tenant.get_full_name }}
-                        {% else %}
-                        Landlord: {{ tenancy.landlord.get_full_name }}
-                        {% endif %}
+                <div style="padding: 0.75rem 0.25rem 0;">
+                    <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 2px;">{{ tenancy.rental_property.name }}</h4>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 2px;"><i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle;"></i> {{ tenancy.rental_property.address }}</p>
+                    <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 2px;">
+                        {% if user.is_landlord %}Tenant: {{ tenancy.tenant.get_full_name }}{% else %}Landlord: {{ tenancy.landlord.get_full_name }}{% endif %}
                     </p>
-                    <div class="rent" style="margin-top: 0.5rem;">
-                        &#8358;{{ tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }}
-                        <span>/ {{ tenancy.rental_property.get_rent_period_display }}</span>
-                    </div>
+                    <p style="font-weight: 700; color: var(--primary); font-size: 1rem;">₦{{ tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }} <span style="font-weight: 400; color: var(--gray-500); font-size: 0.85rem;">/ {{ tenancy.rental_property.get_rent_period_display }}</span></p>
                     {% if tenancy.days_remaining is not None %}
-                    <p
-                        style="font-size: 0.8rem; margin-top: 0.5rem; color: {% if tenancy.days_remaining < 30 %}var(--danger){% elif tenancy.days_remaining < 90 %}var(--warning){% else %}var(--gray-500){% endif %};">
-                        {{ tenancy.days_remaining }} days remaining
-                    </p>
+                    <p style="font-size: 0.85rem; margin-top: 2px; color: {% if tenancy.days_remaining < 30 %}var(--danger){% elif tenancy.days_remaining < 90 %}var(--warning){% else %}var(--gray-500){% endif %};">{{ tenancy.days_remaining }} days remaining</p>
                     {% endif %}
                 </div>
             </a>
@@ -58,11 +52,9 @@
         <div class="empty-state">
             <div class="empty-state-icon"><i data-lucide="key-round" class="icon-md"></i></div>
             <h3>No Active Tenancies</h3>
-            <p>{% if user.is_landlord %}Accept tenant applications to create tenancies.{% else %}Apply for properties on
-                the marketplace to get started.{% endif %}</p>
+            <p>{% if user.is_landlord %}Accept tenant applications to create tenancies.{% else %}Apply for properties on the marketplace to get started.{% endif %}</p>
             {% if user.is_tenant %}
-            <a href="{% url 'marketplace_list' %}" class="btn btn-primary" style="margin-top: 1rem;">Browse
-                Marketplace</a>
+            <a href="{% url 'marketplace_list' %}" class="btn btn-primary" style="margin-top: 1rem;">Browse Marketplace</a>
             {% endif %}
         </div>
         {% endif %}

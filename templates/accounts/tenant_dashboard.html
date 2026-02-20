@@ -16,13 +16,19 @@
         <!-- Active Tenancy Info -->
         <div style="margin-bottom: 2rem;">
             <h2 class="section-title"><i data-lucide="key-round" class="icon-md"></i> Your Active Tenancy</h2>
+            
+            <!-- Property Photo -->
+            {% if active_tenancy.rental_property.photo %}
+            <div style="margin-bottom: 1rem; border-radius: 12px; overflow: hidden;">
+                <img src="{{ active_tenancy.rental_property.photo.url }}" alt="{{ active_tenancy.rental_property.name }}" style="width: 100%; max-height: 320px; object-fit: cover; display: block; border-radius: 12px;">
+            </div>
+            {% endif %}
+            
             <div class="card" style="border-left: 4px solid var(--accent);">
-                <div
-                    style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem;">
                     <div style="flex: 1;">
                         <h3 style="margin-bottom: 0.5rem;">{{ active_tenancy.rental_property.name }}</h3>
-                        <p style="color: var(--gray-500); margin-bottom: 0.75rem;"><i data-lucide="map-pin"
-                                class="icon-xs"></i> {{ active_tenancy.rental_property.address }}</p>
+                        <p style="color: var(--gray-500); margin-bottom: 0.75rem;"><i data-lucide="map-pin" class="icon-xs"></i> {{ active_tenancy.rental_property.address }} · {{ active_tenancy.rental_property.get_state_display }}</p>
                         <p style="color: var(--primary); font-weight: 700; font-size: 1.5rem;">
                             &#8358;{{ active_tenancy.rental_property.rent_amount|floatformat:"0"|intcomma }}
                             <span style="font-size: 0.875rem; font-weight: 400; color: var(--gray-500);">/ {{ active_tenancy.rental_property.get_rent_period_display }}</span>
@@ -30,8 +36,7 @@
                     </div>
                     <div style="text-align: center; min-width: 120px;">
                         {% if active_tenancy.days_remaining is not None %}
-                        <div
-                            style="font-size: 2.5rem; font-weight: 700; color: {% if active_tenancy.days_remaining < 30 %}var(--danger){% elif active_tenancy.days_remaining < 90 %}var(--warning){% else %}var(--accent){% endif %};">
+                        <div style="font-size: 2.5rem; font-weight: 700; color: {% if active_tenancy.days_remaining < 30 %}var(--danger){% elif active_tenancy.days_remaining < 90 %}var(--warning){% else %}var(--accent){% endif %};">
                             {{ active_tenancy.days_remaining }}
                         </div>
                         <p style="color: var(--gray-500); font-size: 0.875rem;">days remaining</p>
@@ -44,12 +49,10 @@
                     </div>
                 </div>
                 <div class="card-footer" style="margin-top: 1.5rem;">
-                    <a href="{% url 'tenancy_detail' pk=active_tenancy.pk %}" class="btn btn-outline btn-sm">View
-                        Details</a>
+                    <a href="{% url 'tenancy_detail' pk=active_tenancy.pk %}" class="btn btn-outline btn-sm">View Details</a>
                     <a href="{% url 'maintenance_create' %}" class="btn btn-outline btn-sm">Report Issue</a>
                     {% if active_tenancy.status == 'active' %}
-                    <a href="{% url 'terminate_tenancy' pk=active_tenancy.pk %}" class="btn btn-danger btn-sm">Request
-                        Termination</a>
+                    <a href="{% url 'terminate_tenancy' pk=active_tenancy.pk %}" class="btn btn-danger btn-sm">Request Termination</a>
                     {% endif %}
                 </div>
             </div>
