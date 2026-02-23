@@ -1772,7 +1772,15 @@ input:checked+.slider:before {
 
 /* Messages Container */
 .messages-container {
-    padding: 1rem 0 0;
+    padding: 0;
+}
+
+.messages-container .container {
+    padding-top: 1rem;
+}
+
+.messages-container .alert:last-child {
+    margin-bottom: 0;
 }
 
 /* Footer Grid */

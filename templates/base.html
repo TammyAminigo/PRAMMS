@@ -162,7 +162,7 @@
             {% for message in messages %}
             <div class="alert alert-{{ message.tags }}" role="alert">
                 <span>{{ message }}</span>
-                <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                <button class="alert-close" onclick="this.parentElement.remove(); var c=document.querySelector('.messages-container'); if(c && !c.querySelector('.alert')) c.remove();">&times;</button>
             </div>
             {% endfor %}
         </div>
@@ -210,7 +210,14 @@
             document.querySelectorAll('.alert').forEach(el => {
                 el.style.transition = 'opacity 0.5s ease';
                 el.style.opacity = '0';
-                setTimeout(() => el.remove(), 500);
+                setTimeout(() => {
+                    el.remove();
+                    // Remove the container if no alerts remain
+                    const container = document.querySelector('.messages-container');
+                    if (container && !container.querySelector('.alert')) {
+                        container.remove();
+                    }
+                }, 500);
             });
         }, 5000);
     </script>
