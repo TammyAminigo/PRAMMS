@@ -50,6 +50,15 @@ def maintenance_create(request):
     
     if request.method == 'POST':
         form = MaintenanceRequestForm(request.POST)
+        images = request.FILES.getlist('images')
+        
+        if not images:
+            messages.error(request, 'At least one photo is required.')
+            return render(request, 'maintenance/maintenance_form.html', {
+                'form': form,
+                'property': property_obj
+            })
+        
         if form.is_valid():
             maintenance_request = form.save(commit=False)
             maintenance_request.tenant = request.user
@@ -57,7 +66,6 @@ def maintenance_create(request):
             maintenance_request.save()
             
             # Handle image uploads (1-3 images)
-            images = request.FILES.getlist('images')
             if len(images) > 3:
                 messages.warning(request, 'Maximum 3 images allowed. Only first 3 were saved.')
                 images = images[:3]
@@ -166,6 +174,17 @@ def maintenance_edit(request, pk):
                         image=image
                     )
             
+            # Ensure at least 1 photo remains after edit
+            final_count = maintenance_request.images.count()
+            if final_count < 1:
+                messages.error(request, 'At least one photo is required. Please upload a photo.')
+                return render(request, 'maintenance/maintenance_edit.html', {
+                    'form': form,
+                    'maintenance_request': maintenance_request,
+                    'current_images': maintenance_request.images.all(),
+                    'available_slots': 3 - maintenance_request.images.count()
+                })
+            
             messages.success(request, 'Maintenance request updated successfully!')
             return redirect('maintenance_detail', pk=pk)
     else:
@@ -196,6 +215,11 @@ def maintenance_delete_image(request, pk):
         return redirect('maintenance_detail', pk=maintenance_request.pk)
     
     if request.method == 'POST':
+        # Prevent deleting the last photo
+        if maintenance_request.images.count() <= 1:
+            messages.error(request, 'You must keep at least one photo. Upload a replacement before deleting.')
+            return redirect('maintenance_edit', pk=maintenance_request.pk)
+        
         image.delete()
         messages.success(request, 'Image deleted successfully!')
         return redirect('maintenance_edit', pk=maintenance_request.pk)
