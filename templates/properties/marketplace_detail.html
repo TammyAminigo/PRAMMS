@@ -26,7 +26,6 @@
                         <img src="{{ property.photo.url }}" alt="{{ property.name }}" id="mainPhoto" class="gallery-main-img">
                         {% endif %}
                         
-                        {% if additional_images %}
                         <!-- Nav Arrows -->
                         <button class="gallery-nav gallery-nav-prev" onclick="galleryPrev()" id="galleryPrev">
                             <i data-lucide="chevron-left" style="width: 20px; height: 20px;"></i>
@@ -34,15 +33,12 @@
                         <button class="gallery-nav gallery-nav-next" onclick="galleryNext()" id="galleryNext">
                             <i data-lucide="chevron-right" style="width: 20px; height: 20px;"></i>
                         </button>
-                        {% endif %}
                         
                         <!-- Photo Counter -->
-                        {% if additional_images %}
                         <div class="gallery-counter">
                             <i data-lucide="image" style="width: 14px; height: 14px;"></i>
-                            <span id="photoCounter">1/{{ additional_images.count|add:1 }}</span>
+                            <span id="photoCounter">1/{% if additional_images %}{{ additional_images.count|add:1 }}{% else %}1{% endif %}</span>
                         </div>
-                        {% endif %}
                     </div>
                     
                     {% if additional_images %}
