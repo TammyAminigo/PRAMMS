@@ -13,7 +13,7 @@ from .forms import PropertyForm
 
 def marketplace_list(request):
     """Public marketplace listing - browse available properties."""
-    properties = Property.objects.filter(is_available=True).order_by('-created_at')
+    properties = Property.objects.filter(is_available=True).prefetch_related('additional_images').order_by('-created_at')
     
     # Search
     query = request.GET.get('q', '')
@@ -62,7 +62,7 @@ def marketplace_list(request):
     if not properties.exists() and not has_searched:
         suggested_properties = Property.objects.filter(
             is_available=True
-        ).order_by('?')[:8]
+        ).prefetch_related('additional_images').order_by('?')[:8]
     
     # Build display labels for breadcrumbs
     listing_type_map = dict(Property.LISTING_TYPE_CHOICES)

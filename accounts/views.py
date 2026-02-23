@@ -243,12 +243,20 @@ def tenant_dashboard(request):
     
     from tenancy.models import Tenancy, TenancyApplication
     from maintenance.models import MaintenanceRequest
+    from properties.models import PropertyImage
     
     # Current tenancy
     current_tenancy = Tenancy.objects.filter(
         tenant=user,
         status='active'
     ).select_related('rental_property').first()
+    
+    # Additional images for active tenancy property
+    additional_images = None
+    if current_tenancy:
+        additional_images = PropertyImage.objects.filter(
+            property=current_tenancy.rental_property
+        ).order_by('order')
     
     # Pending applications
     pending_applications = TenancyApplication.objects.filter(
@@ -272,6 +280,7 @@ def tenant_dashboard(request):
     
     context = {
         'active_tenancy': current_tenancy,
+        'additional_images': additional_images,
         'pending_applications': pending_applications,
         'maintenance_requests': maintenance_requests,
         'past_tenancies': past_tenancies,

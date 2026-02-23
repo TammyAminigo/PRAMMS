@@ -1772,11 +1772,22 @@ input:checked+.slider:before {
 
 /* Messages Container */
 .messages-container {
+    position: fixed;
+    top: 70px;
+    left: 0;
+    right: 0;
+    z-index: 999;
     padding: 0;
+    pointer-events: none;
 }
 
 .messages-container .container {
-    padding-top: 1rem;
+    padding-top: 0.75rem;
+}
+
+.messages-container .alert {
+    pointer-events: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .messages-container .alert:last-child {
