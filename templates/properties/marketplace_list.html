@@ -98,7 +98,7 @@
                     <input type="number" name="max_price" value="{{ max_price }}" placeholder="₦ Max"
                         class="filter-input" min="0">
                 </div>
-                {% if query or bedrooms or min_price or max_price %}
+                {% if has_searched %}
                 <a href="{% url 'marketplace_list' %}?listing_type={{ listing_type|default:'sale' }}"
                     class="filter-clear-btn">
                     <i data-lucide="x" class="icon-xs"></i> Clear
@@ -234,7 +234,7 @@
             <h3 style="color: var(--gray-600); margin-bottom: 0.5rem;">
                 <i data-lucide="sparkles" class="icon-sm" style="vertical-align: middle;"></i> Suggested Properties
             </h3>
-            <p style="color: var(--gray-500); font-size: 0.95rem;">No {{ listing_type_display|lower }} listings yet.
+            <p style="color: var(--gray-500); font-size: 0.95rem;">No {{ listing_type_display|lower }}{% if property_type_display %} {{ property_type_display|lower }}{% endif %} listings yet.
                 Here are some properties you might like:</p>
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">

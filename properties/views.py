@@ -55,7 +55,7 @@ def marketplace_list(request):
         properties = properties.filter(rent_amount__lte=max_price)
     
     # Determine if a real search/filter was performed (listing_type alone doesn't count)
-    has_searched = bool(query or property_type or bedrooms or min_price or max_price)
+    has_searched = bool(query or bedrooms or min_price or max_price)
     
     # If no results and no active search, show suggested properties
     suggested_properties = None
