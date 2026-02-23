@@ -192,7 +192,7 @@
         </p>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
             {% for property in properties %}
-            <div style="text-decoration: none; color: inherit;" class="card-carousel" data-card-id="{{ forloop.counter0 }}">
+            <a href="{% url 'marketplace_detail' pk=property.pk %}" style="text-decoration: none; color: inherit;" class="card-carousel" data-card-id="{{ forloop.counter0 }}">
                 <div style="position: relative; overflow: hidden; border-radius: 12px;">
                     {% if property.photo %}
                     <div class="carousel-track" data-index="0">
@@ -211,10 +211,10 @@
                         <span style="background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">{{ property.get_property_type_display }}</span>
                     </div>
                     {% if property.additional_images.count > 0 %}
-                    <button class="carousel-btn carousel-prev" onclick="event.preventDefault(); carouselPrev(this)" style="position: absolute; top: 50%; left: 8px; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2;">
+                    <button class="carousel-btn carousel-prev" onclick="event.preventDefault(); event.stopPropagation(); carouselPrev(this)" style="position: absolute; top: 50%; left: 8px; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2;">
                         <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
                     </button>
-                    <button class="carousel-btn carousel-next" onclick="event.preventDefault(); carouselNext(this)" style="position: absolute; top: 50%; right: 8px; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2;">
+                    <button class="carousel-btn carousel-next" onclick="event.preventDefault(); event.stopPropagation(); carouselNext(this)" style="position: absolute; top: 50%; right: 8px; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2;">
                         <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
                     </button>
                     <div class="carousel-counter" style="position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 3px; z-index: 2;">
@@ -223,7 +223,6 @@
                     </div>
                     {% endif %}
                 </div>
-                <a href="{% url 'marketplace_detail' pk=property.pk %}" style="text-decoration: none; color: inherit;">
                 <div style="padding: 0.75rem 0.25rem 0;">
                     <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 2px;">{{ property.name }}</h4>
                     <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 4px;"><i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle;"></i> {{ property.address }} · {{ property.get_state_display }}</p>
@@ -232,8 +231,7 @@
                     <p style="color: var(--gray-500); font-size: 0.85rem; margin-top: 2px;"><i data-lucide="bed-double" style="width: 14px; height: 14px; vertical-align: middle;"></i> {{ property.bedrooms }} Bedroom{{ property.bedrooms|pluralize }}</p>
                     {% endif %}
                 </div>
-                </a>
-            </div>
+            </a>
             {% endfor %}
         </div>
         {% else %}
@@ -258,7 +256,7 @@
         </div>
         <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem;">
             {% for property in suggested_properties %}
-            <div style="text-decoration: none; color: inherit;" class="card-carousel" data-card-id="s{{ forloop.counter0 }}">
+            <a href="{% url 'marketplace_detail' pk=property.pk %}" style="text-decoration: none; color: inherit;" class="card-carousel" data-card-id="s{{ forloop.counter0 }}">
                 <div style="position: relative; overflow: hidden; border-radius: 12px;">
                     {% if property.photo %}
                     <div class="carousel-track" data-index="0">
@@ -277,10 +275,10 @@
                         <span style="background: rgba(0,0,0,0.6); color: white; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 600;">{{ property.get_property_type_display }}</span>
                     </div>
                     {% if property.additional_images.count > 0 %}
-                    <button class="carousel-btn carousel-prev" onclick="event.preventDefault(); carouselPrev(this)" style="position: absolute; top: 50%; left: 8px; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2;">
+                    <button class="carousel-btn carousel-prev" onclick="event.preventDefault(); event.stopPropagation(); carouselPrev(this)" style="position: absolute; top: 50%; left: 8px; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2;">
                         <i data-lucide="chevron-left" style="width: 16px; height: 16px;"></i>
                     </button>
-                    <button class="carousel-btn carousel-next" onclick="event.preventDefault(); carouselNext(this)" style="position: absolute; top: 50%; right: 8px; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2;">
+                    <button class="carousel-btn carousel-next" onclick="event.preventDefault(); event.stopPropagation(); carouselNext(this)" style="position: absolute; top: 50%; right: 8px; transform: translateY(-50%); width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.9); border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.15); z-index: 2;">
                         <i data-lucide="chevron-right" style="width: 16px; height: 16px;"></i>
                     </button>
                     <div class="carousel-counter" style="position: absolute; bottom: 10px; right: 10px; background: rgba(255,255,255,0.9); padding: 2px 8px; border-radius: 6px; font-size: 0.75rem; font-weight: 600; display: flex; align-items: center; gap: 3px; z-index: 2;">
@@ -289,7 +287,6 @@
                     </div>
                     {% endif %}
                 </div>
-                <a href="{% url 'marketplace_detail' pk=property.pk %}" style="text-decoration: none; color: inherit;">
                 <div style="padding: 0.75rem 0.25rem 0;">
                     <h4 style="font-size: 1rem; font-weight: 600; margin-bottom: 2px;">{{ property.name }}</h4>
                     <p style="color: var(--gray-500); font-size: 0.875rem; margin-bottom: 4px;"><i data-lucide="map-pin" style="width: 14px; height: 14px; vertical-align: middle;"></i> {{ property.address }} · {{ property.get_state_display }}</p>
@@ -298,8 +295,7 @@
                     <p style="color: var(--gray-500); font-size: 0.85rem; margin-top: 2px;"><i data-lucide="bed-double" style="width: 14px; height: 14px; vertical-align: middle;"></i> {{ property.bedrooms }} Bedroom{{ property.bedrooms|pluralize }}</p>
                     {% endif %}
                 </div>
-                </a>
-            </div>
+            </a>
             {% endfor %}
         </div>
         {% else %}

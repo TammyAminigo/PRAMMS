@@ -24,7 +24,7 @@ class HomeView(TemplateView):
         from properties.models import Property
         context['suggested_properties'] = Property.objects.filter(
             is_available=True
-        ).order_by('-created_at')[:6]
+        ).prefetch_related('additional_images').order_by('-created_at')[:6]
         return context
 
 
