@@ -40,6 +40,11 @@
                 {% endif %}
             </div>
 
+            <!-- Hamburger Toggle (mobile only) -->
+            <button class="hamburger-btn" id="hamburgerBtn" aria-label="Menu" onclick="document.querySelector('.navbar-content').classList.toggle('nav-open'); this.classList.toggle('active');">
+                <span></span><span></span><span></span>
+            </button>
+
             <!-- Center/Right: Discovery Dropdowns -->
             <div class="nav-right">
                 <!-- Buy Dropdown -->
@@ -249,6 +254,22 @@
                 }
             `;
             document.head.appendChild(style);
+
+            // Mobile dropdown tap toggle
+            document.querySelectorAll('.nav-dropdown-trigger').forEach(function(trigger) {
+                trigger.addEventListener('click', function(e) {
+                    if (window.innerWidth <= 768) {
+                        e.preventDefault();
+                        var parent = this.closest('.nav-dropdown');
+                        var wasOpen = parent.classList.contains('open');
+                        // Close all others
+                        document.querySelectorAll('.nav-dropdown.open').forEach(function(d) {
+                            d.classList.remove('open');
+                        });
+                        if (!wasOpen) parent.classList.add('open');
+                    }
+                });
+            });
         });
     </script>
     {% block extra_js %}{% endblock %}

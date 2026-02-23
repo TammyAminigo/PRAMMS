@@ -1867,14 +1867,7 @@ input:checked+.slider:before {
 @media (max-width: 768px) {
     .navbar-content {
         flex-wrap: wrap;
-        gap: 0.75rem;
-    }
-
-    .nav-left,
-    .nav-right {
-        width: 100%;
-        justify-content: center;
-        flex-wrap: wrap;
+        gap: 0.5rem;
     }
 
     .footer-grid {
@@ -2267,4 +2260,242 @@ input:checked+.slider:before {
 
 [data-theme="dark"] .land-result {
     background: var(--primary);
+}
+
+/* ===================================
+   Mobile Hamburger Menu & Responsive
+   =================================== */
+
+/* Hamburger button - hidden on desktop */
+.hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px;
+    z-index: 1001;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 24px;
+    height: 2.5px;
+    background: var(--white);
+    border-radius: 2px;
+    transition: transform 0.3s, opacity 0.3s;
+}
+
+/* Hamburger to X animation */
+.hamburger-btn.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+}
+
+.hamburger-btn.active span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-btn.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+}
+
+@media (max-width: 768px) {
+
+    /* Show hamburger */
+    .hamburger-btn {
+        display: flex;
+    }
+
+    /* Navbar layout */
+    .navbar-content {
+        flex-wrap: wrap;
+        position: relative;
+    }
+
+    .nav-left {
+        flex: 1;
+    }
+
+    .btn-post-property {
+        font-size: 0.75rem;
+        padding: 0.35rem 0.6rem;
+    }
+
+    /* Hide nav-right by default, show on toggle */
+    .nav-right {
+        display: none;
+        width: 100%;
+        flex-direction: column;
+        gap: 0;
+        padding: 0.5rem 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.15);
+        margin-top: 0.5rem;
+    }
+
+    .navbar-content.nav-open .nav-right {
+        display: flex;
+    }
+
+    /* Nav links - full width, touch-friendly */
+    .nav-right .nav-link {
+        width: 100%;
+        padding: 0.75rem 0.5rem;
+        font-size: 0.95rem;
+        border-radius: 8px;
+    }
+
+    .nav-right .nav-link:hover {
+        background: rgba(255, 255, 255, 0.1);
+    }
+
+    /* Dropdowns - full width inline */
+    .nav-dropdown {
+        width: 100%;
+    }
+
+    .nav-dropdown-trigger {
+        width: 100%;
+        text-align: left;
+        padding: 0.75rem 0.5rem;
+        font-size: 0.95rem;
+        border-radius: 8px;
+    }
+
+    .nav-dropdown-menu {
+        position: static;
+        opacity: 1;
+        visibility: visible;
+        transform: none;
+        box-shadow: none;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        margin: 0 0 0.25rem 0;
+        padding: 0.25rem 0;
+        display: none;
+    }
+
+    .nav-dropdown:hover .nav-dropdown-menu,
+    .nav-dropdown.open .nav-dropdown-menu {
+        display: block;
+    }
+
+    .nav-dropdown-menu .dropdown-item {
+        padding: 0.6rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    /* Auth buttons at bottom */
+    .btn-signup {
+        width: 100%;
+        text-align: center;
+        margin-top: 0.25rem;
+    }
+
+    .logout-btn {
+        width: 100%;
+        text-align: left;
+        padding: 0.75rem 0.5rem;
+    }
+
+    .user-avatar-link {
+        order: -1;
+        margin-bottom: 0.25rem;
+    }
+
+    /* Container padding */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Card padding */
+    .card {
+        padding: 1rem;
+    }
+
+    /* Dashboard section */
+    .dashboard {
+        padding: 1.5rem 0;
+    }
+
+    /* Section title */
+    .section-title {
+        font-size: 1.1rem;
+    }
+
+    /* Full-width buttons */
+    .btn-lg {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Forms: stack labels and inputs */
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+        font-size: 16px;
+        /* prevents iOS zoom on focus */
+    }
+
+    /* Reduce heading sizes */
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    h2 {
+        font-size: 1.25rem;
+    }
+
+    h3 {
+        font-size: 1.1rem;
+    }
+
+    /* Tables: horizontal scroll */
+    .table-responsive {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    /* Messages overlay - adjust for mobile */
+    .messages-container {
+        top: 60px;
+    }
+
+    /* Feature grid */
+    .feature-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .navbar-brand {
+        font-size: 1.1rem;
+    }
+
+    .btn-post-property span {
+        display: none;
+    }
+
+    .hero h1 {
+        font-size: 1.5rem;
+    }
+
+    .hero p {
+        font-size: 0.9rem;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Dark mode mobile menu */
+[data-theme="dark"] .nav-dropdown-menu {
+    background: rgba(0, 0, 0, 0.3);
 }
