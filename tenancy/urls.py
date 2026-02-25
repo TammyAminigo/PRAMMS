@@ -11,4 +11,7 @@ urlpatterns = [
     path('<int:pk>/terminate/', views.terminate_tenancy, name='terminate_tenancy'),
     path('active/', views.active_tenancies, name='active_tenancies'),
     path('history/', views.past_tenancies, name='past_tenancies'),
+    path('<int:pk>/tenant-profile/', views.tenant_profile, name='tenant_profile'),
+    path('<int:pk>/upload-document/', views.upload_tenant_document, name='upload_tenant_document'),
+    path('document/<int:pk>/delete/', views.delete_tenant_document, name='delete_tenant_document'),
 ]

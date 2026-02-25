@@ -145,3 +145,23 @@ class Tenancy(models.Model):
             self.status = 'pending_termination'
             self.save()
         return False
+
+
+class TenantDocument(models.Model):
+    """Document or photo stored for a tenant within a tenancy (max 10)."""
+
+    tenancy = models.ForeignKey(
+        Tenancy,
+        on_delete=models.CASCADE,
+        related_name='documents'
+    )
+    name = models.CharField(max_length=200, help_text="Label for this file")
+    file = models.FileField(upload_to='tenant_docs/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'tenant_documents'
+        ordering = ['id']
+
+    def __str__(self):
+        return f"{self.name} — {self.tenancy}"

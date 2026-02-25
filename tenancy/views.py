@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 
-from .models import Tenancy, TenancyApplication
+from .models import Tenancy, TenancyApplication, TenantDocument
 from .forms import TenancyApplicationForm, TerminationForm
 from properties.models import Property
 
@@ -273,3 +273,75 @@ def past_tenancies(request):
     return render(request, 'tenancy/past_tenancies.html', {
         'tenancies': tenancies
     })
+
+
+@login_required
+def tenant_profile(request, pk):
+    """Landlord views a tenant's profile for a given tenancy."""
+    tenancy = get_object_or_404(Tenancy, pk=pk)
+
+    if request.user != tenancy.landlord:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+
+    documents = tenancy.documents.all()
+
+    return render(request, 'tenancy/tenant_profile.html', {
+        'tenancy': tenancy,
+        'documents': documents,
+        'can_add_more': documents.count() < 10,
+    })
+
+
+@login_required
+def upload_tenant_document(request, pk):
+    """Landlord uploads a document for a tenant (max 10)."""
+    tenancy = get_object_or_404(Tenancy, pk=pk)
+
+    if request.user != tenancy.landlord:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        if tenancy.documents.count() >= 10:
+            messages.warning(request, 'Maximum of 10 files reached for this tenant.')
+            return redirect('tenant_profile', pk=pk)
+
+        file_name = request.POST.get('file_name', '').strip()
+        uploaded_file = request.FILES.get('file')
+
+        if not file_name:
+            messages.error(request, 'Please enter a file name.')
+            return redirect('tenant_profile', pk=pk)
+
+        if not uploaded_file:
+            messages.error(request, 'Please select a file to upload.')
+            return redirect('tenant_profile', pk=pk)
+
+        TenantDocument.objects.create(
+            tenancy=tenancy,
+            name=file_name,
+            file=uploaded_file,
+        )
+        messages.success(request, f'"{file_name}" uploaded successfully.')
+
+    return redirect('tenant_profile', pk=pk)
+
+
+@login_required
+def delete_tenant_document(request, pk):
+    """Landlord deletes a tenant document."""
+    document = get_object_or_404(TenantDocument, pk=pk)
+    tenancy_pk = document.tenancy.pk
+
+    if request.user != document.tenancy.landlord:
+        messages.error(request, 'Access denied.')
+        return redirect('dashboard')
+
+    if request.method == 'POST':
+        name = document.name
+        document.delete()
+        messages.success(request, f'"{name}" deleted.')
+
+    return redirect('tenant_profile', pk=tenancy_pk)
+

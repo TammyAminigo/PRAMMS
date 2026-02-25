@@ -112,6 +112,7 @@
             {% endif %}
         </div>
         <div class="card-body">
+            <a href="{% url 'tenant_profile' pk=active_tenancy.pk %}" style="display: block; text-decoration: none; color: inherit; padding: 1rem; margin: -1rem; border-radius: var(--radius); transition: background 0.2s ease; cursor: pointer;" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background='transparent'">
             <div class="detail-grid">
                 <div class="detail-item">
                     <span class="detail-label">Tenant</span>
@@ -143,6 +144,8 @@
                 </div>
                 {% endif %}
             </div>
+            <p style="color: var(--accent); font-size: 0.8rem; margin-top: 0.75rem; font-weight: 600;">Click to view full profile & files →</p>
+            </a>
             <div class="card-footer">
                 <a href="{% url 'tenancy_detail' pk=active_tenancy.pk %}" class="btn btn-outline btn-sm">View Tenancy
                     Details</a>

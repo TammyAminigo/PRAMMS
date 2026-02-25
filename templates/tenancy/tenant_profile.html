@@ -1,0 +1,177 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ tenancy.tenant.get_full_name }} - Tenant Profile - Propz{% endblock %}
+
+{% block content %}
+<div class="dashboard container">
+    <div class="dashboard-header">
+        <div>
+            <a href="{% url 'property_detail' tenancy.rental_property.pk %}" style="color: var(--accent); font-weight: 500;">← Back to {{ tenancy.rental_property.name }}</a>
+            <h1 style="margin-top: 0.5rem;">Tenant Profile</h1>
+        </div>
+    </div>
+
+    <!-- Tenant Info Card -->
+    <div class="card" style="margin-bottom: 1.5rem; border-left: 4px solid var(--accent);">
+        <div class="card-header">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; color: white; font-weight: 700; font-size: 1.1rem;">
+                    {{ tenancy.tenant.first_name.0 }}{{ tenancy.tenant.last_name.0 }}
+                </div>
+                <div>
+                    <h3 class="card-title" style="margin: 0;">{{ tenancy.tenant.get_full_name }}</h3>
+                    <p style="color: var(--gray-500); font-size: 0.85rem; margin: 0;">Tenant at {{ tenancy.rental_property.name }}</p>
+                </div>
+            </div>
+            {% if tenancy.status == 'active' %}
+            <span class="badge badge-success">Active</span>
+            {% else %}
+            <span class="badge badge-warning">{{ tenancy.get_status_display }}</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="detail-grid">
+                <div class="detail-item">
+                    <span class="detail-label">Full Name</span>
+                    <span class="detail-value">{{ tenancy.tenant.get_full_name }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Email</span>
+                    <span class="detail-value">{{ tenancy.tenant.email }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Phone</span>
+                    <span class="detail-value">{{ tenancy.tenant.phone|default:"Not provided" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Lease Start</span>
+                    <span class="detail-value">{{ tenancy.start_date|date:"M d, Y" }}</span>
+                </div>
+                <div class="detail-item">
+                    <span class="detail-label">Lease End</span>
+                    <span class="detail-value">{{ tenancy.lease_end_date|date:"M d, Y"|default:"N/A" }}</span>
+                </div>
+                {% if tenancy.days_remaining is not None %}
+                <div class="detail-item">
+                    <span class="detail-label">Days Remaining</span>
+                    <span class="detail-value" style="font-size: 1.25rem; font-weight: 700; {% if tenancy.days_remaining < 30 %}color: var(--danger){% elif tenancy.days_remaining < 90 %}color: var(--warning){% else %}color: var(--accent){% endif %}">
+                        {{ tenancy.days_remaining }} days
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Tenant Files Section -->
+    <div class="card" style="margin-bottom: 1.5rem;">
+        <div class="card-header" style="cursor: pointer;" onclick="document.getElementById('filesSection').style.display = document.getElementById('filesSection').style.display === 'none' ? 'block' : 'none'; this.querySelector('.toggle-icon').classList.toggle('rotated');">
+            <h3 class="card-title" style="display: flex; align-items: center; gap: 0.5rem;">
+                <i data-lucide="folder-open" class="icon-md"></i> Tenant Files
+                <span style="background: var(--gray-200); color: var(--gray-600); padding: 2px 8px; border-radius: 10px; font-size: 0.75rem; font-weight: 600;">{{ documents.count }}/10</span>
+            </h3>
+            <i data-lucide="chevron-down" class="icon-md toggle-icon" style="transition: transform 0.2s ease;"></i>
+        </div>
+
+        <div id="filesSection" class="card-body" style="display: none;">
+            <!-- Existing Documents -->
+            {% for doc in documents %}
+            <div style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--gray-100); border-radius: var(--radius); margin-bottom: 0.5rem; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 150px;">
+                    <p style="font-weight: 600; margin: 0;">
+                        <i data-lucide="file-text" class="icon-sm" style="vertical-align: middle; margin-right: 4px;"></i>
+                        {{ doc.name }}
+                    </p>
+                    <p style="color: var(--gray-500); font-size: 0.75rem; margin: 2px 0 0 0;">Uploaded {{ doc.uploaded_at|date:"M d, Y" }}</p>
+                </div>
+                <div style="display: flex; gap: 0.5rem; align-items: center;">
+                    <a href="{{ doc.file.url }}" target="_blank" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 4px;">
+                        <i data-lucide="eye" class="icon-xs"></i> View
+                    </a>
+                    <form method="POST" action="{% url 'delete_tenant_document' pk=doc.pk %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this file?')" style="display: inline-flex; align-items: center; gap: 4px;">
+                            <i data-lucide="trash-2" class="icon-xs"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% empty %}
+            <p style="color: var(--gray-500); text-align: center; padding: 1rem 0;" id="noFilesMsg">No files uploaded yet. Add your first file below.</p>
+            {% endfor %}
+
+            <!-- Upload New Document Rows -->
+            {% if can_add_more %}
+            <div id="uploadRows" style="margin-top: 1rem;">
+                <!-- One default empty row -->
+                <form method="POST" action="{% url 'upload_tenant_document' pk=tenancy.pk %}" enctype="multipart/form-data" style="display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--gray-50); border: 2px dashed var(--gray-300); border-radius: var(--radius); margin-bottom: 0.5rem; flex-wrap: wrap;">
+                    {% csrf_token %}
+                    <input type="text" name="file_name" placeholder="File name (e.g. ID Card, Agreement)" required style="flex: 1; min-width: 150px; padding: 0.5rem 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); font-size: 0.9rem; font-family: inherit;">
+                    <label style="display: inline-flex; align-items: center; gap: 6px; padding: 0.5rem 1rem; background: var(--accent); color: white; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; font-weight: 600; white-space: nowrap;">
+                        <i data-lucide="upload" class="icon-xs"></i> Upload File
+                        <input type="file" name="file" required style="display: none;" onchange="this.closest('form').querySelector('.upload-submit-btn').style.display='inline-flex';">
+                    </label>
+                    <button type="submit" class="btn btn-primary btn-sm upload-submit-btn" style="display: none; align-items: center; gap: 4px;">
+                        <i data-lucide="check" class="icon-xs"></i> Save
+                    </button>
+                </form>
+            </div>
+
+            <button type="button" id="addRowBtn" onclick="addUploadRow()" class="btn btn-outline btn-sm" style="margin-top: 0.5rem; display: inline-flex; align-items: center; gap: 6px;">
+                <i data-lucide="plus" class="icon-xs"></i> Add Entry
+            </button>
+            {% else %}
+            <p style="color: var(--warning); text-align: center; padding: 0.75rem; background: rgba(255,193,7,0.1); border-radius: var(--radius); margin-top: 1rem; font-weight: 600;">
+                <i data-lucide="alert-circle" class="icon-sm" style="vertical-align: middle;"></i>
+                Maximum of 10 files reached.
+            </p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    .toggle-icon.rotated {
+        transform: rotate(180deg);
+    }
+</style>
+
+<script>
+    var maxFiles = 10;
+    var currentCount = {{ documents.count }};
+
+    function addUploadRow() {
+        // Count existing upload forms
+        var rows = document.querySelectorAll('#uploadRows form');
+        if (currentCount + rows.length >= maxFiles) {
+            document.getElementById('addRowBtn').style.display = 'none';
+            return;
+        }
+
+        var container = document.getElementById('uploadRows');
+        var row = document.createElement('form');
+        row.method = 'POST';
+        row.action = '{% url "upload_tenant_document" pk=tenancy.pk %}';
+        row.enctype = 'multipart/form-data';
+        row.style.cssText = 'display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1rem; background: var(--gray-50); border: 2px dashed var(--gray-300); border-radius: var(--radius); margin-bottom: 0.5rem; flex-wrap: wrap;';
+        row.innerHTML = '<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">' +
+            '<input type="text" name="file_name" placeholder="File name (e.g. ID Card, Agreement)" required style="flex: 1; min-width: 150px; padding: 0.5rem 0.75rem; border: 1px solid var(--gray-300); border-radius: var(--radius-sm); font-size: 0.9rem; font-family: inherit;">' +
+            '<label style="display: inline-flex; align-items: center; gap: 6px; padding: 0.5rem 1rem; background: var(--accent); color: white; border-radius: var(--radius-sm); cursor: pointer; font-size: 0.85rem; font-weight: 600; white-space: nowrap;">' +
+            '<i data-lucide="upload" class="icon-xs"></i> Upload File' +
+            '<input type="file" name="file" required style="display: none;" onchange="this.closest(\'form\').querySelector(\'.upload-submit-btn\').style.display=\'inline-flex\';">' +
+            '</label>' +
+            '<button type="submit" class="btn btn-primary btn-sm upload-submit-btn" style="display: none; align-items: center; gap: 4px;">' +
+            '<i data-lucide="check" class="icon-xs"></i> Save' +
+            '</button>';
+        container.appendChild(row);
+
+        // Re-init lucide icons for the new row
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+
+        // Hide add button if we reached the limit
+        if (currentCount + document.querySelectorAll('#uploadRows form').length >= maxFiles) {
+            document.getElementById('addRowBtn').style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}
