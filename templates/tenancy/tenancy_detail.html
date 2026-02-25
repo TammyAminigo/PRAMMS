@@ -140,7 +140,11 @@
             <!-- Sidebar -->
             <div class="property-detail-sidebar">
                 <!-- Other Party Info -->
+                {% if is_landlord %}
+                <a href="{% url 'tenant_profile' pk=tenancy.pk %}" class="card" style="margin-bottom: 1.5rem; display: block; text-decoration: none; color: inherit; transition: background 0.2s ease; cursor: pointer;" onmouseover="this.style.background='var(--gray-100)'" onmouseout="this.style.background=''">
+                {% else %}
                 <div class="card" style="margin-bottom: 1.5rem;">
+                {% endif %}
                     <h3 style="margin-bottom: 1rem;">
                         {% if is_landlord %}Tenant{% else %}Landlord{% endif %}
                     </h3>
@@ -162,7 +166,14 @@
                             </p>
                         </div>
                     </div>
+                    {% if is_landlord %}
+                    <p style="color: var(--accent); font-size: 0.8rem; margin-top: 0.75rem; font-weight: 600;">View profile & files →</p>
+                    {% endif %}
+                {% if is_landlord %}
+                </a>
+                {% else %}
                 </div>
+                {% endif %}
 
                 <!-- Actions -->
                 <div class="card">
